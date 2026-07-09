@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation — DairyCare Dairy Farm Management Software</title>
+<meta name="description" content="DairyCare dairy management system documentation — setup guides, module references, roles & permissions, and the API reference.">
+<link rel="canonical" href="https://dairycare.pk/docs.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%2334D399' text-anchor='middle'%3EDC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="announce" id="announce-bar">
+  <span class="long">🚀 DairyCare is now live — organize your farm from day one.</span>
+  <span>New: multi-farm support is here.</span>
+  <a href="#">Start Free Trial →</a>
+  <button class="announce-close" aria-label="Dismiss">×</button>
+</div>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">DC</span>DairyCare</a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <div class="nav-item">
+        <button type="button">Product <span class="chev">▾</span></button>
+        <div class="nav-dropdown">
+          <a href="features.html#animals"><strong>Animal Records</strong><small>Tagging, breeds, lineage &amp; status</small></a>
+          <a href="features.html#milk"><strong>Milk Production</strong><small>AM/PM entry, dispatch &amp; quality</small></a>
+          <a href="features.html#health"><strong>Health &amp; Vaccination</strong><small>Treatments, dewormings, withdrawal</small></a>
+          <a href="features.html#breeding"><strong>Breeding &amp; Reproduction</strong><small>Insemination to calving</small></a>
+          <a href="features.html#inventory"><strong>Inventory &amp; Feed</strong><small>Stock, consumption, reorder alerts</small></a>
+          <a href="features.html#accounts"><strong>Accounts &amp; Finance</strong><small>Ledger, trial balance, P&amp;L</small></a>
+          <a href="features.html"><strong>View all features →</strong></a>
+        </div>
+      </div>
+      <a href="docs.html" class="active">Docs</a>
+      <a href="blog/index.html">Blog</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-secondary">Log in</a>
+      <a href="#" class="btn btn-primary">Start Free Trial</a>
+      <button class="nav-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="mobile-menu">
+      <a href="index.html">Home</a>
+      <div class="mm-label">Product</div>
+      <a href="features.html">Features</a>
+      <a href="features.html#animals">Animal Records</a>
+      <a href="features.html#milk">Milk Production</a>
+      <a href="features.html#health">Health &amp; Vaccination</a>
+      <a href="features.html#breeding">Breeding &amp; Reproduction</a>
+      <a href="features.html#inventory">Inventory &amp; Feed</a>
+      <a href="features.html#accounts">Accounts &amp; Finance</a>
+      <a href="docs.html">Documentation</a>
+      <a href="blog/index.html">Blog</a>
+      <div class="mm-label">Company</div>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <div class="mm-cta">
+        <a href="#" class="btn btn-secondary">Log in</a>
+        <a href="#" class="btn btn-primary">Start Free Trial</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="docs-mobile-bar">
+    <span class="text-mono">DOCUMENTATION</span>
+    <button class="btn btn-secondary docs-toggle" type="button">☰ Browse docs</button>
+  </div>
+
+  <div class="docs-shell">
+
+    <!-- ── Sidebar ─────────────────────────────────────── -->
+    <aside class="docs-sidebar">
+      <div class="docs-search">
+        🔍 <input type="text" placeholder="Search docs…" aria-label="Search documentation"> <kbd>⌘K</kbd>
+      </div>
+
+      <div class="docs-nav-group">
+        <h5>Getting Started</h5>
+        <a href="#introduction">Introduction</a>
+        <a href="#quick-start">Quick Start</a>
+        <a href="#farm-setup">Account &amp; Farm Setup</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <h5>Core Modules</h5>
+        <a href="#animals">Animal Records</a>
+        <a href="#milk">Milk Production</a>
+        <a href="#health">Health &amp; Vaccination</a>
+        <a href="#breeding">Breeding &amp; Reproduction</a>
+        <a href="#inventory">Inventory &amp; Feed</a>
+        <a href="#accounts">Accounts &amp; Finance</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <h5>Administration</h5>
+        <a href="#roles-permissions">Roles &amp; Permissions</a>
+        <a href="#multi-tenant">Multi-Tenant Architecture</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <h5>API Reference</h5>
+        <a href="#api-authentication">Authentication</a>
+        <a href="#api-contact">Public Contact Endpoint</a>
+      </div>
+    </aside>
+
+    <!-- ── Content ─────────────────────────────────────── -->
+    <main class="docs-content">
+
+      <section class="docs-section" id="introduction">
+        <div class="docs-crumb">Getting Started / <span>Introduction</span></div>
+        <span class="eyebrow"><span class="dot"></span>Docs</span>
+        <h2 class="h2" style="margin-top:14px;">Introduction</h2>
+        <p class="lede">DairyCare is farm management software for dairy operations — animal records, milk
+          production, health, breeding, inventory and accounts, all in one connected system.</p>
+        <p>This documentation covers how to set up your farm, how each module works, how roles and
+          permissions are structured, and the public API endpoints available on the platform. If you're
+          just getting started, read <a href="#quick-start" style="color:var(--accent);">Quick Start</a> next.</p>
+        <div class="docs-callout tip">
+          💡 <span>Every farm's data is fully isolated. Nothing you record is ever visible to another
+          tenant on the platform — see <a href="#multi-tenant" style="color:var(--accent);">Multi-Tenant Architecture</a>.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="quick-start">
+        <div class="docs-crumb">Getting Started / <span>Quick Start</span></div>
+        <h2 class="h2">Quick Start</h2>
+        <p class="lede">Go from signup to your first logged milk record in under ten minutes.</p>
+        <h3>1. Create your account</h3>
+        <p>Register through the app's sign-up page with your email and farm name. This
+          automatically creates your farm's isolated workspace (tenant) and makes you its owner.</p>
+        <h3>2. Add sheds and animal groups</h3>
+        <p>Under <strong>Settings → Sheds &amp; Groups</strong>, create the physical sheds on your farm
+          and any logical groups you use — e.g. High Yielders, Dry Group, Heifers.</p>
+        <h3>3. Add your animals</h3>
+        <p>In <strong>Animals</strong>, add each animal with its tag number, breed, sex and status. You
+          can also bulk-import via the Excel template from the Milk module once animals exist.</p>
+        <h3>4. Log your first milk entry</h3>
+        <p>Go to <strong>Milk → Bulk Entry</strong>, pick a date and session (AM/PM), and enter litres for
+          each milking animal in one sheet.</p>
+        <div class="docs-callout">
+          ℹ️ <span>Team members you invite only see the modules their role grants — see
+          <a href="#roles-permissions" style="color:var(--accent);">Roles &amp; Permissions</a>.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="farm-setup">
+        <div class="docs-crumb">Getting Started / <span>Account &amp; Farm Setup</span></div>
+        <h2 class="h2">Account &amp; Farm Setup</h2>
+        <p class="lede">Configuration that shapes how every other module behaves.</p>
+        <h3>Farm profile</h3>
+        <ul class="doc-list">
+          <li>Name, owner email, phone, address, city and country</li>
+          <li>Gestation period (days) — used to calculate expected calving dates</li>
+          <li>Financial year start month — used for accounting reports</li>
+          <li>Default milk price per litre and timezone</li>
+        </ul>
+        <h3>Sheds &amp; animal groups</h3>
+        <p>Sheds represent physical locations (capacity, notes); animal groups are logical groupings used
+          for filtering and reporting. Both are scoped to your farm and can be renamed or removed at any time —
+          removing a shed unassigns its animals rather than deleting them.</p>
+        <h3>Breeds</h3>
+        <p>DairyCare ships with a global breed list covering cattle, buffalo and goat (Holstein Friesian,
+          Jersey, Sahiwal, Nili-Ravi, Murrah, Beetal and more). You can also add farm-specific breeds.</p>
+      </section>
+
+      <section class="docs-section" id="animals">
+        <div class="docs-crumb">Core Modules / <span>Animal Records</span></div>
+        <h2 class="h2">Animal Records</h2>
+        <p class="lede">A full lifecycle record for every animal on the farm.</p>
+        <h3>Fields tracked</h3>
+        <ul class="doc-list">
+          <li>Tag number, name, breed, sex, date of birth</li>
+          <li>Status — heifer, open, inseminated, pregnant, dry, sick, sold, culled, dead</li>
+          <li>Shed and animal group assignment</li>
+          <li>Dam (mother) linkage, sire tag, lactation number</li>
+          <li>Purchase date, purchase price, weight (kg)</li>
+        </ul>
+        <h3>Status lifecycle</h3>
+        <p>An animal's status typically moves: <em>heifer → open → inseminated → pregnant → dry →
+          open</em> (post-calving), with <em>sick</em>, <em>sold</em>, <em>culled</em> and <em>dead</em>
+          available at any point. Milk records can only be logged for animals in a milking status
+          (open, inseminated, or pregnant).</p>
+      </section>
+
+      <section class="docs-section" id="milk">
+        <div class="docs-crumb">Core Modules / <span>Milk Production</span></div>
+        <h2 class="h2">Milk Production</h2>
+        <p class="lede">Twice-daily entry, reconciled against dispatch and consumption.</p>
+        <h3>Milk records</h3>
+        <p>Each record captures date, session (AM/PM), litres, and optional FAT% / SNF% quality readings,
+          unique per animal per date per session. Bulk Entry lets you fill an entire herd's sheet for one
+          session at once, and the Excel template supports import for teams migrating from paper registers.</p>
+        <h3>Consumption</h3>
+        <p>Milk consumed on-farm (mess, calf feeding, employee rations, etc.) is tracked separately via
+          configurable consumption categories, so your chiller balance reflects what was actually dispatched.</p>
+        <h3>Dispatch</h3>
+        <p>Corporate and local dispatch records capture buyer, gross litres, lactometer reading, FAT/SNF,
+          price per litre and amount received — feeding directly into the Accounts module as milk sale
+          transactions.</p>
+      </section>
+
+      <section class="docs-section" id="health">
+        <div class="docs-crumb">Core Modules / <span>Health &amp; Vaccination</span></div>
+        <h2 class="h2">Health &amp; Vaccination</h2>
+        <p class="lede">Treatments, vaccinations, dewormings and disease events per animal.</p>
+        <ul class="doc-list">
+          <li><strong>Treatments</strong> — diagnosis, drug, dosage, route, cost, outcome, and a
+            withdrawal period tracked automatically from the treatment date</li>
+          <li><strong>Vaccinations &amp; dewormings</strong> — individual or group/shed-wide, with next
+            due date</li>
+          <li><strong>Disease events</strong> — severity (mild/moderate/severe), symptoms and resolution
+            date</li>
+        </ul>
+        <div class="docs-callout warn">
+          ⚠️ <span>Milk from an animal within its active withdrawal period should be excluded from
+          dispatch — the dashboard surfaces animals currently under withdrawal.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="breeding">
+        <div class="docs-crumb">Core Modules / <span>Breeding &amp; Reproduction</span></div>
+        <h2 class="h2">Breeding &amp; Reproduction</h2>
+        <p class="lede">The full reproductive timeline, from service to calving.</p>
+        <ul class="doc-list">
+          <li><strong>Insemination</strong> — AI (with semen batch) or natural service, with a repeat
+            number for tracking re-services</li>
+          <li><strong>Pregnancy test</strong> — rectal, ultrasound, blood or milk progesterone, linked to
+            the originating insemination</li>
+          <li><strong>Expected calving date</strong> — calculated automatically as insemination date +
+            your farm's configured gestation period</li>
+          <li><strong>Dry-off, calving and abortion</strong> — including calf tag, sex and birth weight on
+            calving</li>
+        </ul>
+      </section>
+
+      <section class="docs-section" id="inventory">
+        <div class="docs-crumb">Core Modules / <span>Inventory &amp; Feed</span></div>
+        <h2 class="h2">Inventory &amp; Feed</h2>
+        <p class="lede">Feed, medicine and semen stock, tracked from purchase to consumption.</p>
+        <ul class="doc-list">
+          <li>Products categorized as feed, medicine, semen or general, each with a reorder level</li>
+          <li>Stock-in with supplier, invoice/batch number and expiry date</li>
+          <li>Consumption linked optionally to a shed, animal, treatment, or insemination</li>
+          <li>Current stock computed live as stock-in minus consumption</li>
+        </ul>
+      </section>
+
+      <section class="docs-section" id="accounts">
+        <div class="docs-crumb">Core Modules / <span>Accounts &amp; Finance</span></div>
+        <h2 class="h2">Accounts &amp; Finance</h2>
+        <p class="lede">Real double-entry bookkeeping, reconciled against farm activity.</p>
+        <ul class="doc-list">
+          <li>Chart of accounts: asset, liability, income, expense and equity heads, with optional parent/child hierarchy</li>
+          <li>Transactions always post a debit and credit account — cash receipts, payments, purchases,
+            milk sales and corporate payments</li>
+          <li>Ledger, trial balance and profit &amp; loss reports generated on demand for any date range</li>
+          <li>Fixed assets with straight-line depreciation based on useful life and salvage value</li>
+        </ul>
+      </section>
+
+      <section class="docs-section" id="roles-permissions">
+        <div class="docs-crumb">Administration / <span>Roles &amp; Permissions</span></div>
+        <h2 class="h2">Roles &amp; Permissions</h2>
+        <p class="lede">Every user on your farm has exactly one role, which scopes what they can see.</p>
+        <div class="table-wrap">
+          <table class="role-table">
+            <thead><tr><th>Role</th><th>Typical access</th></tr></thead>
+            <tbody>
+              <tr><td>owner</td><td>Full access to every module, settings and user management</td></tr>
+              <tr><td>manager</td><td>Day-to-day operations across all modules</td></tr>
+              <tr><td>veterinary</td><td>Health &amp; vaccination, animal records</td></tr>
+              <tr><td>accountant</td><td>Accounts &amp; finance, milk dispatch payments</td></tr>
+              <tr><td>technician</td><td>Breeding &amp; reproduction records</td></tr>
+              <tr><td>milker</td><td>Milk entry only</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="docs-section" id="multi-tenant">
+        <div class="docs-crumb">Administration / <span>Multi-Tenant Architecture</span></div>
+        <h2 class="h2">Multi-Tenant Architecture</h2>
+        <p class="lede">Each farm is a fully isolated tenant — nothing crosses boundaries.</p>
+        <p>Every request to the API (outside of authentication and public endpoints) must include an
+          <code>X-Tenant-ID</code> header identifying the farm. All records — animals, milk data, health
+          events, transactions — carry a tenant reference, and every query is scoped to that tenant
+          automatically. Groups managing more than one farm can switch between tenants without their
+          data ever mixing.</p>
+      </section>
+
+      <section class="docs-section" id="api-authentication">
+        <div class="docs-crumb">API Reference / <span>Authentication</span></div>
+        <h2 class="h2">Authentication</h2>
+        <p class="lede">DairyCare's API uses JWT bearer tokens, plus a tenant header on every scoped request.</p>
+        <div class="doc-endpoint"><span class="method post">POST</span> /api/auth/login/</div>
+        <div class="code-block">
+          <div class="cb-top"><span>Request</span><span>application/json</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"email"</span>: <span class="tok-str">"you@farm.com"</span>,
+  <span class="tok-str">"password"</span>: <span class="tok-str">"••••••••"</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="cb-top"><span>Response</span><span>200 OK</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"access"</span>: <span class="tok-str">"eyJhbGciOi..."</span>,
+  <span class="tok-str">"refresh"</span>: <span class="tok-str">"eyJhbGciOi..."</span>,
+  <span class="tok-str">"user"</span>: <span class="tok-key">{ "email": "you@farm.com", "tenant_id": "..." }</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <h3>Authenticated requests</h3>
+        <p>Send the access token as a bearer token, and your tenant ID on every tenant-scoped endpoint:</p>
+        <div class="code-block">
+          <pre><span class="tok-com"># Example — fetch animal summary</span>
+curl https://&lt;your-api-host&gt;/api/animals/summary/ \
+  -H <span class="tok-str">"Authorization: Bearer &lt;access_token&gt;"</span> \
+  -H <span class="tok-str">"X-Tenant-ID: &lt;your_tenant_id&gt;"</span></pre>
+        </div>
+        <div class="docs-callout tip">
+          💡 <span>Access tokens expire; use <code>/api/auth/token/refresh/</code> with your refresh
+          token to get a new one without re-authenticating.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="api-contact">
+        <div class="docs-crumb">API Reference / <span>Public Contact Endpoint</span></div>
+        <h2 class="h2">Public Contact Endpoint</h2>
+        <p class="lede">The one endpoint that doesn't require authentication or a tenant header — used by this marketing site's contact form.</p>
+        <div class="doc-endpoint"><span class="method post">POST</span> /api/public/contact/</div>
+        <div class="code-block">
+          <div class="cb-top"><span>Request</span><span>application/json</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"name"</span>: <span class="tok-str">"Ali Tarar"</span>,
+  <span class="tok-str">"email"</span>: <span class="tok-str">"ali@example.com"</span>,
+  <span class="tok-str">"farm_name"</span>: <span class="tok-str">"Tarar Dairy Farm"</span>,
+  <span class="tok-str">"herd_size"</span>: <span class="tok-str">"50-200"</span>,
+  <span class="tok-str">"message"</span>: <span class="tok-str">"Interested in a demo."</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <p>Returns <code>201 Created</code> with the saved inquiry on success. Rate-limited to 10
+          requests per hour per IP address to prevent abuse.</p>
+      </section>
+
+    </main>
+
+    <!-- ── On this page ────────────────────────────────── -->
+    <aside class="docs-toc">
+      <h5>On this page</h5>
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#quick-start">Quick Start</a></li>
+        <li><a href="#farm-setup">Farm Setup</a></li>
+        <li><a href="#animals">Animal Records</a></li>
+        <li><a href="#milk">Milk Production</a></li>
+        <li><a href="#health">Health &amp; Vaccination</a></li>
+        <li><a href="#breeding">Breeding &amp; Reproduction</a></li>
+        <li><a href="#inventory">Inventory &amp; Feed</a></li>
+        <li><a href="#accounts">Accounts &amp; Finance</a></li>
+        <li><a href="#roles-permissions">Roles &amp; Permissions</a></li>
+        <li><a href="#multi-tenant">Multi-Tenant</a></li>
+        <li><a href="#api-authentication">API — Authentication</a></li>
+        <li><a href="#api-contact">API — Contact</a></li>
+      </ul>
+    </aside>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <h3 class="h3">Get product updates.</h3>
+        <p class="lede" style="margin-top:8px; font-size:14px;">New modules, migration guides, and release notes — no spam.</p>
+      </div>
+      <form class="newsletter" onsubmit="return false;">
+        <input type="email" placeholder="you@farm.com" aria-label="Email address">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <a href="index.html" class="brand"><span class="brand-mark">DC</span>DairyCare</a>
+        <p>Farm management software for modern dairy operations. A Silicate Labs product, built in Islamabad, Pakistan.</p>
+        <span class="badge badge-live" style="margin-top:18px;">All systems operational</span>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="index.html#features">Overview</a></li>
+          <li><a href="#">Changelog <span class="tag">soon</span></a></li>
+          <li><a href="#">Status <span class="tag">soon</span></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="features.html#animals">Animal Records</a></li>
+          <li><a href="features.html#milk">Milk Production</a></li>
+          <li><a href="features.html#health">Health &amp; Vaccination</a></li>
+          <li><a href="features.html#breeding">Breeding &amp; Reproduction</a></li>
+          <li><a href="features.html#inventory">Inventory &amp; Feed</a></li>
+          <li><a href="features.html#accounts">Accounts &amp; Finance</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="blog/index.html">Blog</a></li>
+          <li><a href="docs.html#api-authentication">API Reference</a></li>
+          <li><a href="contact.html#faq">FAQ</a></li>
+          <li><a href="contact.html">Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="about.html#founder">Founder's Note</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="mailto:hello@dairycare.pk">hello@dairycare.pk</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Silicate Labs. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Security</a>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="LinkedIn">in</a>
+        <a href="#" aria-label="Twitter">X</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
