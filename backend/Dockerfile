@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     shared-mime-info \
     postgresql-client \
     curl \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -33,5 +34,16 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
+# This image is shared by three services (backend, celery, celery_beat — see
+# docker-compose.yml's SERVICE_NAME env var), only one of which actually serves
+# HTTP on 8000. A single curl-based check would report celery/celery_beat as
+# permanently unhealthy since nothing is ever listening on that port there.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ || exit 1
+    CMD sh -c '\
+        if [ "$SERVICE_NAME" = "backend" ]; then \
+            curl -f http://localhost:8000/api/health/ || exit 1; \
+        elif [ "$SERVICE_NAME" = "celery" ]; then \
+            celery -A config inspect ping -d "celery@$HOSTNAME" || exit 1; \
+        else \
+            pgrep -f "celery.*beat" > /dev/null || exit 1; \
+        fi'
