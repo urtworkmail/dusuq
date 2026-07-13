@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:80'
+// VITE_API_URL="" (explicitly empty, not unset) means "same origin as the page" —
+// a relative /api works regardless of domain, IP, or http/https, since the API
+// is always served from the same nginx host as the frontend in this setup.
+const BASE_URL = import.meta.env.VITE_API_URL !== undefined
+  ? import.meta.env.VITE_API_URL
+  : 'http://localhost:80'
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,

@@ -39,7 +39,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        VITE_API_URL: ${VITE_API_URL:-https://erp.dusuq.com}
+        # Relative by default — frontend and API are always same-origin behind
+        # nginx here, whether that origin is a domain or a bare IP. Only override
+        # if the frontend is ever served from a different host than the API.
+        VITE_API_URL: ${VITE_API_URL:-}
     ports: []
     volumes: []  # prod image is self-contained (dist baked in); no dev bind-mounts
 
@@ -49,7 +52,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf
+      # NGINX_CONF: nginx.prod.conf (default, needs a real cert — see
+      # VPS_DEPLOYMENT.md) or nginx.no-ssl.conf (plain HTTP, no cert/DNS needed —
+      # see nginx/nginx.no-ssl.conf). Set in .env.
+      - ./nginx/${NGINX_CONF:-nginx.prod.conf}:/etc/nginx/conf.d/default.conf
       - ./marketing:/var/www/marketing:ro
       - static_files:/var/www/static
       - media_files:/var/www/media
