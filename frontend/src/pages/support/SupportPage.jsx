@@ -1,4 +1,4 @@
-import { LifeBuoy, BookOpen, Mail, Ticket, ExternalLink } from 'lucide-react'
+import { LifeBuoy, BookOpen, Mail, Ticket, Phone, ExternalLink } from 'lucide-react'
 
 const DOCS_BASE = 'https://dusuq.com/docs.html'
 
@@ -114,7 +114,7 @@ export default function SupportPage() {
       </div>
 
       <h2 className="text-base font-semibold text-gray-700 mb-3">Still stuck? Contact us.</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="card flex items-start gap-4">
           <div className="stat-icon bg-primary-50 flex-shrink-0">
             <Mail size={18} className="text-primary-600" />
@@ -148,6 +148,19 @@ export default function SupportPage() {
             </p>
           </div>
         </a>
+
+        <div className="card flex items-start gap-4">
+          <div className="stat-icon bg-primary-50 flex-shrink-0">
+            <Phone size={18} className="text-primary-600" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-gray-900 text-sm mb-1">Call support</h4>
+            <a href="tel:+923316560344" className="text-primary-600 font-medium text-sm hover:underline">
+              +92 331 6560344
+            </a>
+            <p className="text-xs text-gray-400 mt-1">Available 9am – 5pm.</p>
+          </div>
+        </div>
       </div>
     </div>
   )
