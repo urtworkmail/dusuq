@@ -5,7 +5,7 @@ import NotificationBell from '@/components/layout/NotificationBell'
 import {
   LayoutDashboard, Beef, Heart, Droplets, DollarSign,
   Package, BarChart2, Settings, LogOut, Menu, X,
-  Syringe, ChevronRight, Sparkles
+  Syringe, ChevronRight, Sparkles, LifeBuoy
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -20,6 +20,7 @@ const NAV = [
   { to: '/reports',     label: 'Reports',       icon: BarChart2 },
   { to: '/vetassist',   label: 'VetAssist',     icon: Sparkles },
   { to: '/settings',    label: 'Settings',      icon: Settings },
+  { to: '/support',     label: 'ERP Support',   icon: LifeBuoy },
 ]
 
 function NavItem({ item, onClick }) {

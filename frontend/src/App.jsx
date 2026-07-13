@@ -18,6 +18,7 @@ import InventoryPage from '@/pages/inventory/InventoryPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import VetAssistPage from '@/pages/vetassist/VetAssistPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
+import SupportPage from '@/pages/support/SupportPage'
 
 function RequireAuth({ children }) {
   const { user } = useAuth()
@@ -51,6 +52,7 @@ export default function App() {
         <Route path="reports/*" element={<ReportsPage />} />
         <Route path="vetassist/*" element={<VetAssistPage />} />
         <Route path="settings/*" element={<SettingsPage />} />
+        <Route path="support" element={<SupportPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
