@@ -264,12 +264,24 @@ cd /opt/dusuq-erp
 # Pull latest code
 git pull origin main
 
-# Rebuild and restart
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Rebuild and restart — --force-recreate matters here
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --force-recreate
 
 # Run any new migrations
 docker compose exec backend python manage.py migrate
 ```
+
+**Why `--force-recreate` and not just `up -d --build`:** Compose only recreates
+a container when *its own service definition* changes (image, env vars, the
+volume *mount line* itself). `nginx` and `frontend` get their real content from
+files referenced by a bind mount (`nginx/*.conf`, the built React `dist/`) —
+editing those files' *content* via `git pull` doesn't change the mount line, so
+Compose can decide nothing changed and leave the old container running with a
+stale, orphaned reference to the pre-pull file (bind mounts attach to the
+file's inode at container creation; `git pull` replaces the file rather than
+editing it in place, so the running container keeps seeing the old one).
+`--force-recreate` sidesteps the diffing entirely and just recreates
+everything, which is the reliable choice for a routine deploy.
 
 ---
 
