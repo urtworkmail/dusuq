@@ -5,7 +5,11 @@ env = environ.Env()
 
 DEBUG = False
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
+# "localhost" is always included — the Dockerfile's own HEALTHCHECK curls
+# http://localhost:8000/api/health/ from inside the container, and without it
+# in ALLOWED_HOSTS that probe gets a 400 and the container shows unhealthy
+# forever regardless of what's configured for the outside world.
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[]) + ["localhost"]
 
 # CORS — restrict to the marketing site's origin(s) in production. The app itself
 # (erp.dusuq.com) doesn't need to be listed here — its requests to its own /api/ are
