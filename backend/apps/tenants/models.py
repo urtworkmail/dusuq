@@ -57,7 +57,7 @@ class SMTPConfig(models.Model):
     use_tls = models.BooleanField(default=True)
     use_ssl = models.BooleanField(default=False)
     from_email = models.EmailField()
-    from_name = models.CharField(max_length=100, default="DairyCare")
+    from_name = models.CharField(max_length=100, default="Dusuq ERP")
     is_verified = models.BooleanField(default=False)
     last_tested_at = models.DateTimeField(null=True, blank=True)
 

@@ -5,7 +5,7 @@ import NotificationBell from '@/components/layout/NotificationBell'
 import {
   LayoutDashboard, Beef, Heart, Droplets, DollarSign,
   Package, BarChart2, Settings, LogOut, Menu, X,
-  Syringe, ChevronRight
+  Syringe, ChevronRight, Sparkles
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -18,6 +18,7 @@ const NAV = [
   { to: '/accounts',    label: 'Accounts',      icon: DollarSign },
   { to: '/inventory',   label: 'Inventory',     icon: Package },
   { to: '/reports',     label: 'Reports',       icon: BarChart2 },
+  { to: '/vetassist',   label: 'VetAssist',     icon: Sparkles },
   { to: '/settings',    label: 'Settings',      icon: Settings },
 ]
 
@@ -57,7 +58,7 @@ export default function AppLayout() {
       <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/10">
         <span className="text-2xl">🐄</span>
         <div>
-          <p className="text-white font-bold text-base leading-tight">DairyCare</p>
+          <p className="text-white font-bold text-base leading-tight">Dusuq ERP</p>
           <p className="text-green-200 text-xs truncate max-w-[140px]">{user?.tenant_name}</p>
         </div>
         {mobile && (

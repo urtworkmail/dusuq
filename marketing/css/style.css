@@ -1,6 +1,6 @@
 /* ============================================================
-   DairyCare marketing site — design system
-   Brand system per Silicate Labs, product accent overridden green
+   Dusuq ERP marketing site — design system
+   Brand system per Dusuq, product accent overridden green
    ============================================================ */
 
 :root {
@@ -19,7 +19,7 @@
   --border:       rgba(255,255,255,0.08);
   --border-hover: rgba(255,255,255,0.18);
 
-  /* Product accent — DairyCare green (overrides Silicate default blue) */
+  /* Product accent — Dusuq ERP green */
   --accent:       #34D399;
   --accent-dim:   #1F8F68;
   --accent-hover: #6EE7B7;
@@ -656,7 +656,7 @@ tr:last-child td { border-bottom: none; }
 .contact-card .ci-body p { font-size: 13.5px; color: var(--text-secondary); }
 .contact-card .ci-body a { color: var(--accent); font-weight: 600; }
 
-#form-success {
+#form-success, #ticket-success {
   display: none;
   align-items: center; gap: 12px;
   padding: 16px 18px;
@@ -667,9 +667,9 @@ tr:last-child td { border-bottom: none; }
   font-size: 14px;
   margin-bottom: 20px;
 }
-#form-success.show { display: flex; }
+#form-success.show, #ticket-success.show { display: flex; }
 
-#form-error {
+#form-error, #ticket-error {
   display: none;
   align-items: center; gap: 12px;
   padding: 16px 18px;
@@ -680,7 +680,17 @@ tr:last-child td { border-bottom: none; }
   font-size: 14px;
   margin-bottom: 20px;
 }
-#form-error.show { display: flex; }
+#form-error.show, #ticket-error.show { display: flex; }
+
+#ticket-lookup-result {
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+#ticket-lookup-result.show { display: block; }
 
 /* ── About page specifics ─────────────────────────────────── */
 .timeline { display: flex; flex-direction: column; }

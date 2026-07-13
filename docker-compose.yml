@@ -3,7 +3,7 @@ version: "3.9"
 services:
   db:
     image: postgres:15-alpine
-    container_name: dairycare_db
+    container_name: dusuq_erp_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: dairycare
@@ -22,7 +22,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: dairycare_redis
+    container_name: dusuq_erp_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -36,7 +36,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: dairycare_backend
+    container_name: dusuq_erp_backend
     restart: unless-stopped
     env_file: .env
     environment:
@@ -59,7 +59,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: dairycare_celery
+    container_name: dusuq_erp_celery
     restart: unless-stopped
     env_file: .env
     environment:
@@ -78,7 +78,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: dairycare_celery_beat
+    container_name: dusuq_erp_celery_beat
     restart: unless-stopped
     env_file: .env
     environment:
@@ -97,7 +97,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: dairycare_frontend
+    container_name: dusuq_erp_frontend
     restart: unless-stopped
     volumes:
       - ./frontend:/app
@@ -111,7 +111,7 @@ services:
 
   nginx:
     image: nginx:1.25-alpine
-    container_name: dairycare_nginx
+    container_name: dusuq_erp_nginx
     restart: unless-stopped
     ports:
       - "8084:80"

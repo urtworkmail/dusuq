@@ -16,6 +16,7 @@ import MilkPage from '@/pages/milk/MilkPage'
 import AccountsPage from '@/pages/accounts/AccountsPage'
 import InventoryPage from '@/pages/inventory/InventoryPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
+import VetAssistPage from '@/pages/vetassist/VetAssistPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
 
 function RequireAuth({ children }) {
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="accounts/*" element={<AccountsPage />} />
         <Route path="inventory/*" element={<InventoryPage />} />
         <Route path="reports/*" element={<ReportsPage />} />
+        <Route path="vetassist/*" element={<VetAssistPage />} />
         <Route path="settings/*" element={<SettingsPage />} />
       </Route>
 

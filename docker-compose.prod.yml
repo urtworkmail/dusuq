@@ -38,7 +38,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://erp.dusuq.com}
     ports: []
+    volumes: []  # prod image is self-contained (dist baked in); no dev bind-mounts
 
   nginx:
     restart: always
@@ -47,7 +50,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/ssl:/etc/nginx/ssl
+      - ./marketing:/var/www/marketing:ro
       - static_files:/var/www/static
       - media_files:/var/www/media
       - /etc/letsencrypt:/etc/letsencrypt:ro

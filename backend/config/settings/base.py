@@ -58,6 +58,8 @@ LOCAL_APPS = [
     "apps.notifications",
     "apps.reports",
     "apps.contact",
+    "apps.tickets",
+    "apps.vetassist",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -106,6 +108,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_THROTTLE_RATES": {
         "contact": "10/hour",
+        "tickets": "10/hour",
     },
 }
 
@@ -180,8 +183,12 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # ─── API Docs ─────────────────────────────────────────────────────────────────
 SPECTACULAR_SETTINGS = {
-    "TITLE": "DairyCare API",
+    "TITLE": "Dusuq ERP API",
     "DESCRIPTION": "Multi-tenant dairy farm management platform",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+# ─── VetAssist (Gemini API) ─────────────────────────────────────────────────────
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.0-flash")

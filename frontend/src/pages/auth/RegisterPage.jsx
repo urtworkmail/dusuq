@@ -35,7 +35,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <span className="text-5xl">🐄</span>
-          <h1 className="text-3xl font-bold text-white mt-3">DairyCare</h1>
+          <h1 className="text-3xl font-bold text-white mt-3">Dusuq ERP</h1>
           <p className="text-green-200 mt-1 text-sm">Set up your farm account</p>
         </div>
 

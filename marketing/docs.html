@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Documentation — DairyCare Dairy Farm Management Software</title>
-<meta name="description" content="DairyCare dairy management system documentation — setup guides, module references, roles & permissions, and the API reference.">
-<link rel="canonical" href="https://dairycare.pk/docs.html">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%2334D399' text-anchor='middle'%3EDC%3C/text%3E%3C/svg%3E">
+<title>Documentation — Dusuq ERP Dairy Farm Management Software</title>
+<meta name="description" content="Dusuq ERP dairy management system documentation — setup guides, module references, roles & permissions, VetAssist, the ERP v2.0 roadmap, and the API reference.">
+<link rel="canonical" href="https://dusuq.com/docs.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%2334D399' text-anchor='middle'%3EDQ%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
 <div class="bg-glow"></div>
 
 <div class="announce" id="announce-bar">
-  <span class="long">🚀 DairyCare is now live — organize your farm from day one.</span>
+  <span class="long">🚀 Dusuq ERP is now live — organize your farm from day one.</span>
   <span>New: multi-farm support is here.</span>
   <a href="#">Start Free Trial →</a>
   <button class="announce-close" aria-label="Dismiss">×</button>
@@ -25,7 +25,7 @@
 
 <header class="nav">
   <div class="container nav-inner">
-    <a href="index.html" class="brand"><span class="brand-mark">DC</span>DairyCare</a>
+    <a href="index.html" class="brand"><span class="brand-mark">DQ</span>Dusuq ERP</a>
     <nav class="nav-links">
       <a href="index.html">Home</a>
       <div class="nav-item">
@@ -37,11 +37,13 @@
           <a href="features.html#breeding"><strong>Breeding &amp; Reproduction</strong><small>Insemination to calving</small></a>
           <a href="features.html#inventory"><strong>Inventory &amp; Feed</strong><small>Stock, consumption, reorder alerts</small></a>
           <a href="features.html#accounts"><strong>Accounts &amp; Finance</strong><small>Ledger, trial balance, P&amp;L</small></a>
+          <a href="vetassist.html"><strong>VetAssist</strong><small>Ask questions, generate vet reports</small></a>
           <a href="features.html"><strong>View all features →</strong></a>
         </div>
       </div>
       <a href="docs.html" class="active">Docs</a>
       <a href="blog/index.html">Blog</a>
+      <a href="roadmap.html">Roadmap</a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -64,9 +66,11 @@
       <a href="features.html#accounts">Accounts &amp; Finance</a>
       <a href="docs.html">Documentation</a>
       <a href="blog/index.html">Blog</a>
+      <a href="roadmap.html">Roadmap</a>
       <div class="mm-label">Company</div>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
+      <a href="support.html">Support</a>
       <div class="mm-cta">
         <a href="#" class="btn btn-secondary">Log in</a>
         <a href="#" class="btn btn-primary">Start Free Trial</a>
@@ -113,8 +117,28 @@
       </div>
 
       <div class="docs-nav-group">
+        <h5>VetAssist</h5>
+        <a href="#vetassist-overview">Overview</a>
+        <a href="#vetassist-data-access">Data Access Model</a>
+        <a href="#vetassist-qa">Asking Questions</a>
+        <a href="#vetassist-reports">Report Generation</a>
+        <a href="#vetassist-forecasting">Forecasting &amp; Analysis</a>
+        <a href="#vetassist-research">External Research</a>
+        <a href="#vetassist-model">Model &amp; Data Handling</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <h5>ERP v2.0 Roadmap</h5>
+        <a href="#v2-overview">Overview</a>
+        <a href="#v2-cctv">CCTV &amp; IR Monitoring</a>
+        <a href="#v2-rfid">RFID Tagging</a>
+      </div>
+
+      <div class="docs-nav-group">
         <h5>API Reference</h5>
         <a href="#api-authentication">Authentication</a>
+        <a href="#api-tickets">Support Tickets</a>
+        <a href="#api-vetassist">VetAssist Endpoints</a>
         <a href="#api-contact">Public Contact Endpoint</a>
       </div>
     </aside>
@@ -126,7 +150,7 @@
         <div class="docs-crumb">Getting Started / <span>Introduction</span></div>
         <span class="eyebrow"><span class="dot"></span>Docs</span>
         <h2 class="h2" style="margin-top:14px;">Introduction</h2>
-        <p class="lede">DairyCare is farm management software for dairy operations — animal records, milk
+        <p class="lede">Dusuq ERP is farm management software for dairy operations — animal records, milk
           production, health, breeding, inventory and accounts, all in one connected system.</p>
         <p>This documentation covers how to set up your farm, how each module works, how roles and
           permissions are structured, and the public API endpoints available on the platform. If you're
@@ -175,7 +199,7 @@
           for filtering and reporting. Both are scoped to your farm and can be renamed or removed at any time —
           removing a shed unassigns its animals rather than deleting them.</p>
         <h3>Breeds</h3>
-        <p>DairyCare ships with a global breed list covering cattle, buffalo and goat (Holstein Friesian,
+        <p>Dusuq ERP ships with a global breed list covering cattle, buffalo and goat (Holstein Friesian,
           Jersey, Sahiwal, Nili-Ravi, Murrah, Beetal and more). You can also add farm-specific breeds.</p>
       </section>
 
@@ -304,10 +328,162 @@
           data ever mixing.</p>
       </section>
 
+      <section class="docs-section" id="vetassist-overview">
+        <div class="docs-crumb">VetAssist / <span>Overview</span></div>
+        <span class="eyebrow"><span class="dot"></span>VetAssist</span>
+        <h2 class="h2" style="margin-top:14px;">Overview</h2>
+        <p class="lede">VetAssist is a highly intelligent system built into Dusuq ERP, with read access to
+          every module in your farm's workspace.</p>
+        <p>Instead of navigating to a specific module to find an answer, you ask VetAssist directly — in
+          plain language — and it works out which module (or modules) the answer actually lives in. It
+          can answer about a single animal, an entire herd or shed, or the farm's financial position, and
+          it can generate structured reports on request rather than just answering inline.</p>
+        <div class="docs-callout tip">
+          💡 <span>VetAssist doesn't replace a vet's judgment. It's built to help vets and farm owners
+          understand their animals better, by surfacing what the farm's own data already shows.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="vetassist-data-access">
+        <div class="docs-crumb">VetAssist / <span>Data Access Model</span></div>
+        <h2 class="h2">Data Access Model</h2>
+        <p class="lede">VetAssist reads across every module — nothing is walled off from it within your farm.</p>
+        <ul class="doc-list">
+          <li><strong>Animal Records</strong> — tag, breed, status, lineage, shed/group assignment</li>
+          <li><strong>Milk Production</strong> — yield history, quality readings, dispatch and consumption</li>
+          <li><strong>Health &amp; Vaccination</strong> — treatments, withdrawal periods, vaccination and deworming schedules, disease events</li>
+          <li><strong>Breeding &amp; Reproduction</strong> — insemination, pregnancy tests, calving history, expected dates</li>
+          <li><strong>Inventory &amp; Feed</strong> — stock levels, consumption linked to animals or sheds</li>
+          <li><strong>Accounts &amp; Finance</strong> — ledger, trial balance, dispatch payments, profit &amp; loss</li>
+        </ul>
+        <p>Access to VetAssist follows the same role-based permissions as the rest of the platform — a
+          user can only ask about (or receive answers drawing from) modules their role already grants
+          access to. VetAssist's queries are always scoped to the requesting user's tenant; it never has
+          visibility into another farm's data.</p>
+      </section>
+
+      <section class="docs-section" id="vetassist-qa">
+        <div class="docs-crumb">VetAssist / <span>Asking Questions</span></div>
+        <h2 class="h2">Asking Questions</h2>
+        <p class="lede">Any question that touches data already in Dusuq ERP can be asked directly.</p>
+        <p>VetAssist is available from anywhere in the app as a persistent assistant panel. A question can
+          reference a specific animal by tag number, a shed or animal group, or the farm as a whole —
+          VetAssist resolves the reference and queries the relevant module(s) before answering.</p>
+        <h3>Example questions</h3>
+        <ul class="doc-list">
+          <li>"Why has COW-014's milk yield dropped this week?"</li>
+          <li>"Which animals are due for vaccination in the next 7 days?"</li>
+          <li>"What was our feed cost last month compared to the month before?"</li>
+          <li>"Is Shed 3's average yield trending up or down this quarter?"</li>
+          <li>"Which dispatch payments are still outstanding?"</li>
+        </ul>
+      </section>
+
+      <section class="docs-section" id="vetassist-reports">
+        <div class="docs-crumb">VetAssist / <span>Report Generation</span></div>
+        <h2 class="h2">Report Generation</h2>
+        <p class="lede">Ask for a report on any animal or herd, and VetAssist compiles one from what's on record.</p>
+        <p>Provide an animal's tag number (or a shed/group for a herd-level report) and VetAssist pulls
+          that entity's full history across every module — health events, breeding timeline, yield trend,
+          feed consumption — into a single structured report.</p>
+        <h3>When research is included</h3>
+        <p>If the underlying data points to a need — a declining yield trend, a resolved but recent
+          disease event, an unusual gap in weight gain — VetAssist researches relevant diet plans or
+          treatment strategies and includes them as a recommendation within the report. A vet can also
+          request this research directly for any animal, independent of a full report, or ask a specific
+          question about a condition or symptom.</p>
+        <div class="docs-callout">
+          ℹ️ <span>Report requests, like all VetAssist activity, are logged against your farm's tenant and
+          can be reviewed by anyone with access to the source animal or herd.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="vetassist-forecasting">
+        <div class="docs-crumb">VetAssist / <span>Forecasting &amp; Analysis</span></div>
+        <h2 class="h2">Forecasting &amp; Analysis</h2>
+        <p class="lede">Historical analysis and forward-looking forecasts, for both animals and finances.</p>
+        <ul class="doc-list">
+          <li>Yield trend analysis for an individual animal, a group, or the whole herd, over any date range</li>
+          <li>Financial forecasting — projected milk revenue, feed cost trajectory, cash position</li>
+          <li>Period-over-period comparisons — this month vs. last, this season vs. the same season last year</li>
+        </ul>
+        <p>Forecasts are generated from the same data VetAssist has access to elsewhere — they improve in
+          accuracy as more history accumulates in your farm's records, and further still once <a href="#v2-overview" style="color:var(--accent);">ERP v2.0's continuous monitoring</a> data is available.</p>
+      </section>
+
+      <section class="docs-section" id="vetassist-research">
+        <div class="docs-crumb">VetAssist / <span>External Research</span></div>
+        <h2 class="h2">External Research</h2>
+        <p class="lede">When your farm's data doesn't have the answer, VetAssist looks beyond it.</p>
+        <p>Diet science, disease information and treatment strategy aren't things a farm's own records can
+          fully contain. In these cases, VetAssist supplements your data with researched information — for
+          example, suggesting a diet adjustment appropriate to a documented health condition, or outlining
+          treatment options for a logged disease event. Your farm's own data is always checked first;
+          external research is used to fill in what your records can't answer on their own.</p>
+      </section>
+
+      <section class="docs-section" id="vetassist-model">
+        <div class="docs-crumb">VetAssist / <span>Model &amp; Data Handling</span></div>
+        <h2 class="h2">Model &amp; Data Handling</h2>
+        <p class="lede">VetAssist's reasoning is powered by Google's Gemini API.</p>
+        <p>Your farm's data is retrieved from Dusuq ERP's database and passed to the model as context for
+          a given query or report — it is not used to train or fine-tune any underlying model. Every
+          request VetAssist makes is scoped by the same tenant isolation as the rest of the platform, so a
+          query can only ever draw on the requesting farm's own records.</p>
+        <div class="docs-callout warn">
+          ⚠️ <span>VetAssist is a decision-support tool. Treatment, diet and breeding decisions should
+          always be confirmed by a qualified veterinarian before being acted on.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="v2-overview">
+        <div class="docs-crumb">ERP v2.0 Roadmap / <span>Overview</span></div>
+        <span class="eyebrow"><span class="dot"></span>Roadmap</span>
+        <h2 class="h2" style="margin-top:14px;">Overview</h2>
+        <p class="lede">Dusuq ERP v2.0 adds continuous, camera- and tag-based monitoring on top of the
+          manual records the platform already keeps.</p>
+        <p>Today, Dusuq ERP is as accurate as what's manually entered. v2.0 is designed to close the gaps
+          between entries — connecting CCTV feeds, infrared visualization and RFID-tagged tracking so that
+          highly intelligent systems can build detailed, personalized reports for any entity, whether a
+          single animal or an entire herd, continuously rather than only when someone logs an event. See
+          the full <a href="roadmap.html" style="color:var(--accent);">v2.0 roadmap page</a> for the
+          product overview.</p>
+        <div class="docs-callout tip">
+          💡 <span>v2.0 is on the roadmap and not yet shipped. This section documents the intended design
+          so teams can plan ahead.</span>
+        </div>
+      </section>
+
+      <section class="docs-section" id="v2-cctv">
+        <div class="docs-crumb">ERP v2.0 Roadmap / <span>CCTV &amp; IR Monitoring</span></div>
+        <h2 class="h2">CCTV &amp; IR Monitoring</h2>
+        <p class="lede">Camera feeds become structured, queryable data instead of raw footage.</p>
+        <ul class="doc-list">
+          <li>Integration with existing or new farm CCTV infrastructure</li>
+          <li>Infrared (IR) visualization for continuous overnight monitoring</li>
+          <li>Feed output is processed by highly intelligent systems trained to prepare detailed,
+            personalized reports for any entity — one animal or a whole herd</li>
+          <li>Designed to help vet doctors understand animals better across every stage of the animal
+            lifecycle, including forecasting and diet planning</li>
+        </ul>
+      </section>
+
+      <section class="docs-section" id="v2-rfid">
+        <div class="docs-crumb">ERP v2.0 Roadmap / <span>RFID Tagging</span></div>
+        <h2 class="h2">RFID Tagging</h2>
+        <p class="lede">RFID tags give computer vision models a reliable way to track individual animals continuously.</p>
+        <ul class="doc-list">
+          <li>An RFID tag is installed on each animal, linking its physical presence on camera to its existing Dusuq ERP record</li>
+          <li>Computer vision (CV) models monitor tagged animals 24/7 across integrated camera feeds</li>
+          <li>Historical analysis and forecasting are built automatically from the resulting continuous data</li>
+          <li>This monitoring data becomes available to <a href="#vetassist-overview" style="color:var(--accent);">VetAssist</a>, deepening the reports and forecasts it can generate</li>
+        </ul>
+      </section>
+
       <section class="docs-section" id="api-authentication">
         <div class="docs-crumb">API Reference / <span>Authentication</span></div>
         <h2 class="h2">Authentication</h2>
-        <p class="lede">DairyCare's API uses JWT bearer tokens, plus a tenant header on every scoped request.</p>
+        <p class="lede">Dusuq ERP's API uses JWT bearer tokens, plus a tenant header on every scoped request.</p>
         <div class="doc-endpoint"><span class="method post">POST</span> /api/auth/login/</div>
         <div class="code-block">
           <div class="cb-top"><span>Request</span><span>application/json</span></div>
@@ -338,6 +514,64 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
         </div>
       </section>
 
+      <section class="docs-section" id="api-vetassist">
+        <div class="docs-crumb">API Reference / <span>VetAssist Endpoints</span></div>
+        <h2 class="h2">VetAssist Endpoints</h2>
+        <p class="lede">Authenticated, tenant-scoped endpoints for asking questions and generating reports.</p>
+
+        <div class="doc-endpoint"><span class="method post">POST</span> /api/vetassist/query/</div>
+        <div class="code-block">
+          <div class="cb-top"><span>Request</span><span>application/json</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"question"</span>: <span class="tok-str">"Why has COW-014's milk yield dropped this week?"</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="cb-top"><span>Response</span><span>200 OK</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"answer"</span>: <span class="tok-str">"Yield is down 18% vs. her 30-day average..."</span>,
+  <span class="tok-str">"sources"</span>: <span class="tok-key">["animals", "milk", "health"]</span>,
+  <span class="tok-str">"generated_at"</span>: <span class="tok-str">"2026-07-12T09:14:00Z"</span>
+<span class="tok-key">}</span></pre>
+        </div>
+
+        <div class="doc-endpoint"><span class="method post">POST</span> /api/vetassist/reports/</div>
+        <div class="code-block">
+          <div class="cb-top"><span>Request</span><span>application/json</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"entity_type"</span>: <span class="tok-str">"animal"</span>,
+  <span class="tok-str">"entity_id"</span>: <span class="tok-str">"COW-014"</span>,
+  <span class="tok-str">"include_research"</span>: <span class="tok-key">true</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <p><code>entity_type</code> accepts <code>animal</code>, <code>shed</code>, or <code>group</code>
+          for herd-level reports. Set <code>include_research</code> to <code>true</code> to allow
+          VetAssist to research diet or treatment recommendations when the data warrants it.</p>
+
+        <div class="doc-endpoint"><span class="method get">GET</span> /api/vetassist/reports/&lt;id&gt;/</div>
+        <p>Retrieves a previously generated report by ID — reports are saved against the farm's tenant
+          and remain accessible to any user with permission to view the source animal or herd.</p>
+
+        <div class="doc-endpoint"><span class="method post">POST</span> /api/vetassist/forecast/</div>
+        <div class="code-block">
+          <div class="cb-top"><span>Request</span><span>application/json</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"metric"</span>: <span class="tok-str">"milk_revenue"</span>,
+  <span class="tok-str">"scope"</span>: <span class="tok-str">"farm"</span>,
+  <span class="tok-str">"horizon_days"</span>: <span class="tok-key">30</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <p><code>metric</code> accepts values like <code>milk_yield</code>, <code>milk_revenue</code>, or
+          <code>feed_cost</code>; <code>scope</code> accepts <code>animal</code>, <code>shed</code>,
+          <code>group</code>, or <code>farm</code>.</p>
+
+        <div class="docs-callout tip">
+          💡 <span>All VetAssist endpoints require the same <code>Authorization</code> bearer token and
+          <code>X-Tenant-ID</code> header as every other tenant-scoped endpoint — see
+          <a href="#api-authentication" style="color:var(--accent);">Authentication</a>.</span>
+        </div>
+      </section>
+
       <section class="docs-section" id="api-contact">
         <div class="docs-crumb">API Reference / <span>Public Contact Endpoint</span></div>
         <h2 class="h2">Public Contact Endpoint</h2>
@@ -357,6 +591,65 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
           requests per hour per IP address to prevent abuse.</p>
       </section>
 
+      <section class="docs-section" id="api-tickets">
+        <div class="docs-crumb">API Reference / <span>Support Tickets</span></div>
+        <h2 class="h2">Support Tickets</h2>
+        <p class="lede">Public endpoints — no authentication or tenant header required. Used by the
+          <a href="support.html" style="color:var(--accent);">support ticket page</a> on this site.</p>
+        <p>The support ticket system is intentionally separate from the authenticated app API: it's the
+          channel for someone who can't get into their account, or whose issue is with the account
+          itself. Submitting a ticket only requires an organization name and the Dusuq ERP account
+          username the ticket concerns — not a valid session.</p>
+
+        <div class="doc-endpoint"><span class="method post">POST</span> /api/public/tickets/</div>
+        <div class="code-block">
+          <div class="cb-top"><span>Request</span><span>application/json</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"organization_name"</span>: <span class="tok-str">"Tarar Dairy Farm"</span>,
+  <span class="tok-str">"account_username"</span>: <span class="tok-str">"ali.tarar"</span>,
+  <span class="tok-str">"email"</span>: <span class="tok-str">"ali@example.com"</span>,
+  <span class="tok-str">"subject"</span>: <span class="tok-str">"Can't log milk dispatch for yesterday"</span>,
+  <span class="tok-str">"description"</span>: <span class="tok-str">"Getting a 500 error when saving..."</span>
+<span class="tok-key">}</span></pre>
+        </div>
+        <div class="code-block">
+          <div class="cb-top"><span>Response</span><span>201 Created</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"ticket_number"</span>: <span class="tok-str">"TKT-A1B2C3D4"</span>,
+  <span class="tok-str">"organization_name"</span>: <span class="tok-str">"Tarar Dairy Farm"</span>,
+  <span class="tok-str">"account_username"</span>: <span class="tok-str">"ali.tarar"</span>,
+  <span class="tok-str">"status"</span>: <span class="tok-str">"open"</span>,
+  <span class="tok-str">"priority"</span>: <span class="tok-str">"medium"</span>,
+  <span class="tok-str">"created_at"</span>: <span class="tok-str">"2026-07-12T09:14:00Z"</span>
+<span class="tok-key">}</span></pre>
+        </div>
+
+        <div class="doc-endpoint"><span class="method get">GET</span> /api/public/tickets/&lt;ticket_number&gt;/</div>
+        <p>Looks up a ticket's status by its reference number. Returns only the subject and status — not
+          the organization, account username, or description — since the reference number is the only
+          credential required to check it.</p>
+        <div class="code-block">
+          <div class="cb-top"><span>Response</span><span>200 OK</span></div>
+          <pre><span class="tok-key">{</span>
+  <span class="tok-str">"ticket_number"</span>: <span class="tok-str">"TKT-A1B2C3D4"</span>,
+  <span class="tok-str">"subject"</span>: <span class="tok-str">"Can't log milk dispatch for yesterday"</span>,
+  <span class="tok-str">"status"</span>: <span class="tok-str">"in_progress"</span>,
+  <span class="tok-str">"status_display"</span>: <span class="tok-str">"In Progress"</span>,
+  <span class="tok-str">"created_at"</span>: <span class="tok-str">"2026-07-12T09:14:00Z"</span>,
+  <span class="tok-str">"updated_at"</span>: <span class="tok-str">"2026-07-12T14:02:00Z"</span>
+<span class="tok-key">}</span></pre>
+        </div>
+
+        <div class="docs-callout tip">
+          💡 <span>Ticket status (<code>open</code>, <code>in_progress</code>, <code>resolved</code>,
+          <code>closed</code>) and priority are managed by support staff from the Django admin panel —
+          there is no public endpoint to change them.</span>
+        </div>
+        <div class="docs-callout warn">
+          ⚠️ <span>Both endpoints are rate-limited to 10 requests per hour per IP address.</span>
+        </div>
+      </section>
+
     </main>
 
     <!-- ── On this page ────────────────────────────────── -->
@@ -374,7 +667,11 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
         <li><a href="#accounts">Accounts &amp; Finance</a></li>
         <li><a href="#roles-permissions">Roles &amp; Permissions</a></li>
         <li><a href="#multi-tenant">Multi-Tenant</a></li>
+        <li><a href="#vetassist-overview">VetAssist</a></li>
+        <li><a href="#v2-overview">ERP v2.0 Roadmap</a></li>
         <li><a href="#api-authentication">API — Authentication</a></li>
+        <li><a href="#api-tickets">API — Support Tickets</a></li>
+        <li><a href="#api-vetassist">API — VetAssist</a></li>
         <li><a href="#api-contact">API — Contact</a></li>
       </ul>
     </aside>
@@ -397,8 +694,8 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
 
     <div class="footer-grid">
       <div class="footer-col footer-brand">
-        <a href="index.html" class="brand"><span class="brand-mark">DC</span>DairyCare</a>
-        <p>Farm management software for modern dairy operations. A Silicate Labs product, built in Islamabad, Pakistan.</p>
+        <a href="index.html" class="brand"><span class="brand-mark">DQ</span>Dusuq ERP</a>
+        <p>Farm management software for modern dairy operations. A Dusuq product, built in Islamabad, Pakistan.</p>
         <span class="badge badge-live" style="margin-top:18px;">All systems operational</span>
       </div>
       <div class="footer-col">
@@ -407,6 +704,7 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
           <li><a href="features.html">Features</a></li>
           <li><a href="docs.html">Documentation</a></li>
           <li><a href="index.html#features">Overview</a></li>
+          <li><a href="roadmap.html">ERP v2.0 Roadmap</a></li>
           <li><a href="#">Changelog <span class="tag">soon</span></a></li>
           <li><a href="#">Status <span class="tag">soon</span></a></li>
         </ul>
@@ -420,6 +718,7 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
           <li><a href="features.html#breeding">Breeding &amp; Reproduction</a></li>
           <li><a href="features.html#inventory">Inventory &amp; Feed</a></li>
           <li><a href="features.html#accounts">Accounts &amp; Finance</a></li>
+          <li><a href="vetassist.html">VetAssist</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -429,7 +728,7 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
           <li><a href="blog/index.html">Blog</a></li>
           <li><a href="docs.html#api-authentication">API Reference</a></li>
           <li><a href="contact.html#faq">FAQ</a></li>
-          <li><a href="contact.html">Support</a></li>
+          <li><a href="support.html">Support</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -438,13 +737,13 @@ curl https://&lt;your-api-host&gt;/api/animals/summary/ \
           <li><a href="about.html">About</a></li>
           <li><a href="about.html#founder">Founder's Note</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li><a href="mailto:hello@dairycare.pk">hello@dairycare.pk</a></li>
+          <li><a href="mailto:hello@dusuq.com">hello@dusuq.com</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>© 2026 Silicate Labs. All rights reserved.</p>
+      <p>© 2026 Dusuq. All rights reserved.</p>
       <div class="footer-legal">
         <a href="#">Privacy Policy</a>
         <a href="#">Terms of Service</a>

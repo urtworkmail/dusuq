@@ -1,5 +1,5 @@
 #!/bin/bash
-# ─── DairyCare Database Backup Script ─────────────────────────────────────────
+# ─── Dusuq ERP Database Backup Script ──────────────────────────────────────────
 # Usage: ./scripts/backup_db.sh
 # Add to cron: 0 2 * * * /path/to/dairycare/scripts/backup_db.sh
 

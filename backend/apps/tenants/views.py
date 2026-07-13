@@ -81,9 +81,9 @@ class SMTPTestView(APIView):
                 use_ssl=config.use_ssl,
             )
             email = EmailMessage(
-                subject="DairyCare SMTP Test",
+                subject="Dusuq ERP SMTP Test",
                 body=(
-                    f"This is a test email from DairyCare for farm: "
+                    f"This is a test email from Dusuq ERP for farm: "
                     f"{request.tenant.name}. Your SMTP configuration is working."
                 ),
                 from_email=f"{config.from_name} <{config.from_email}>",

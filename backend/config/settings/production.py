@@ -7,8 +7,19 @@ DEBUG = False
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
-# CORS — restrict to your domain in production
+# CORS — restrict to the marketing site's origin(s) in production. The app itself
+# (erp.dusuq.com) doesn't need to be listed here — its requests to its own /api/ are
+# same-origin. This is for cross-origin calls from the marketing site (dusuq.com).
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+
+# Required for Django admin / CSRF-protected POSTs to work behind the nginx reverse
+# proxy — must include the scheme, e.g. https://erp.dusuq.com
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
+
+# nginx terminates TLS and forwards X-Forwarded-Proto; without this, Django can't
+# tell the original request was HTTPS and SECURE_SSL_REDIRECT below causes a
+# redirect loop.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Security hardening
 SECURE_BROWSER_XSS_FILTER = True

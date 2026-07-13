@@ -36,7 +36,7 @@ def _from_address(tenant):
         cfg = tenant.smtp_config
         return f"{cfg.from_name} <{cfg.from_email}>"
     except Exception:
-        return "DairyCare <noreply@dairycare.app>"
+        return "Dusuq ERP <noreply@dusuq.com>"
 
 
 def create_notification(tenant, user, notif_type, title, message, link="", send_email=True):

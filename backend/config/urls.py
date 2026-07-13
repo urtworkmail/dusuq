@@ -16,6 +16,7 @@ urlpatterns = [
 
     # Public marketing site endpoints (no auth, no tenant)
     path("api/public/contact/", include("apps.contact.urls")),
+    path("api/public/tickets/", include("apps.tickets.urls")),
 
     # Auth
     path("api/auth/", include("apps.users.urls")),
@@ -30,6 +31,7 @@ urlpatterns = [
     path("api/inventory/", include("apps.inventory.urls")),
     path("api/notifications/", include("apps.notifications.urls")),
     path("api/reports/", include("apps.reports.urls")),
+    path("api/vetassist/", include("apps.vetassist.urls")),
 ]
 
 if settings.DEBUG:

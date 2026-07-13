@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetAssist — Highly Intelligent Farm Assistant | Dusuq ERP</title>
+<meta name="description" content="VetAssist is Dusuq ERP's highly intelligent system — ask questions about any animal, herd, or financial record, and get reports, forecasts, and vet-grade research on demand.">
+<meta name="keywords" content="VetAssist, dairy farm AI assistant, vet report generator, dairy farm forecasting, animal report generator, dairy management software">
+<link rel="canonical" href="https://dusuq.com/vetassist.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="VetAssist — Highly Intelligent Farm Assistant | Dusuq ERP">
+<meta property="og:description" content="Ask questions about any animal, herd, or financial record. VetAssist generates reports, forecasts and vet-grade research on demand.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A0A'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='16' font-weight='700' fill='%2334D399' text-anchor='middle'%3EDQ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "VetAssist",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "description": "A highly intelligent system within Dusuq ERP that answers natural-language questions across every farm module and generates per-animal and per-herd reports.",
+  "url": "https://dusuq.com/vetassist.html",
+  "isPartOf": { "@type": "SoftwareApplication", "name": "Dusuq ERP" },
+  "publisher": { "@type": "Organization", "name": "Dusuq", "url": "https://dusuq.com/about.html" }
+}
+</script>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div class="announce" id="announce-bar">
+  <span class="long">🚀 Dusuq ERP is now live — organize your farm from day one.</span>
+  <span>New: multi-farm support is here.</span>
+  <a href="index.html">Start Free Trial →</a>
+  <button class="announce-close" aria-label="Dismiss">×</button>
+</div>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand"><span class="brand-mark">DQ</span>Dusuq ERP</a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <div class="nav-item">
+        <button type="button">Product <span class="chev">▾</span></button>
+        <div class="nav-dropdown">
+          <a href="features.html#animals"><strong>Animal Records</strong><small>Tagging, breeds, lineage &amp; status</small></a>
+          <a href="features.html#milk"><strong>Milk Production</strong><small>AM/PM entry, dispatch &amp; quality</small></a>
+          <a href="features.html#health"><strong>Health &amp; Vaccination</strong><small>Treatments, dewormings, withdrawal</small></a>
+          <a href="features.html#breeding"><strong>Breeding &amp; Reproduction</strong><small>Insemination to calving</small></a>
+          <a href="features.html#inventory"><strong>Inventory &amp; Feed</strong><small>Stock, consumption, reorder alerts</small></a>
+          <a href="features.html#accounts"><strong>Accounts &amp; Finance</strong><small>Ledger, trial balance, P&amp;L</small></a>
+          <a href="vetassist.html"><strong>VetAssist</strong><small>Ask questions, generate vet reports</small></a>
+          <a href="features.html"><strong>View all features →</strong></a>
+        </div>
+      </div>
+      <a href="docs.html">Docs</a>
+      <a href="blog/index.html">Blog</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-secondary">Log in</a>
+      <a href="#" class="btn btn-primary">Start Free Trial</a>
+      <button class="nav-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="mobile-menu">
+      <a href="index.html">Home</a>
+      <div class="mm-label">Product</div>
+      <a href="features.html">Features</a>
+      <a href="features.html#animals">Animal Records</a>
+      <a href="features.html#milk">Milk Production</a>
+      <a href="features.html#health">Health &amp; Vaccination</a>
+      <a href="features.html#breeding">Breeding &amp; Reproduction</a>
+      <a href="features.html#inventory">Inventory &amp; Feed</a>
+      <a href="features.html#accounts">Accounts &amp; Finance</a>
+      <a href="vetassist.html">VetAssist</a>
+      <a href="docs.html">Documentation</a>
+      <a href="blog/index.html">Blog</a>
+      <a href="roadmap.html">Roadmap</a>
+      <div class="mm-label">Company</div>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="support.html">Support</a>
+      <div class="mm-cta">
+        <a href="#" class="btn btn-secondary">Log in</a>
+        <a href="#" class="btn btn-primary">Start Free Trial</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Hero ────────────────────────────────────────────── -->
+<section class="hero" style="padding-bottom:40px;">
+  <div class="container">
+    <div class="hero-inner center" style="max-width:780px;">
+      <span class="eyebrow"><span class="dot"></span>VetAssist</span>
+      <h1 class="h1" style="margin-top:20px;">Ask your farm anything. Get a real answer.</h1>
+      <p class="lede" style="margin-top:20px;">
+        VetAssist is a highly intelligent system built into Dusuq ERP with access to every module —
+        animals, milk, health, breeding, inventory and accounts. Ask it about one animal or the whole
+        herd, and it answers from your farm's actual data, not a generic script.
+      </p>
+      <div class="hero-cta">
+        <a href="index.html" class="btn btn-primary btn-lg">Start Free Trial</a>
+        <a href="docs.html#vetassist-overview" class="btn btn-secondary btn-lg">Read the Docs</a>
+      </div>
+    </div>
+
+    <div class="hero-panel reveal" style="max-width:640px; margin-inline:auto; margin-top:48px;">
+      <div class="hero-panel-top">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="text-mono" style="margin-left:8px;">vetassist/query</span>
+      </div>
+      <div class="hero-panel-body">
+        <div class="mock-grid" style="grid-template-columns:1fr;">
+          <div class="mock-card">
+            <div class="k">You asked</div>
+            <div class="v" style="font-size:14.5px; font-weight:500;">"Generate a report on COW-014 — include a diet recommendation if her yield trend needs one."</div>
+          </div>
+          <div class="mock-card">
+            <div class="k">VetAssist</div>
+            <div class="v" style="font-size:13.5px; font-weight:400; color:var(--text-secondary); line-height:1.6;">
+              COW-014 (Sahiwal, Lactation 3): 30-day yield down 12%, no active health flags, last
+              deworming 6 days ago — within normal recovery range. Feed consumption at 92% of ration.
+              Recommendation: hold current ration 5 more days before adjusting; yield typically recovers
+              fully by day 10-12 post-treatment in comparable cases.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── What it does ──────────────────────────────────────── -->
+<section class="container">
+
+  <div class="feature-row reveal" id="qa">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Ask anything</span>
+      <h2 class="h2" style="margin-top:16px;">Every module, one question box.</h2>
+      <p class="lede" style="margin-top:12px;">VetAssist has read access to everything in your farm's
+        workspace — it doesn't matter which module the answer actually lives in.</p>
+      <ul class="feature-list">
+        <li><span class="ck">✓</span>Ask about a single animal by tag number, or a whole herd or shed</li>
+        <li><span class="ck">✓</span>Cross-reference health, breeding and milk records in one answer</li>
+        <li><span class="ck">✓</span>Query accounts and finance — outstanding payments, trial balance, cash position</li>
+        <li><span class="ck">✓</span>Every answer is scoped to your farm's tenant — nothing crosses boundaries</li>
+      </ul>
+    </div>
+    <div class="feature-visual">
+      <div class="mock-grid" style="grid-template-columns:1fr;">
+        <div class="mock-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>"How many animals are due for deworming this week?"</span>
+        </div>
+        <div class="mock-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>"What was our milk revenue last month vs. the month before?"</span>
+        </div>
+        <div class="mock-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>"Which animals in the High Yielders group are past their expected calving date?"</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-row reverse reveal" id="reports">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Report generation</span>
+      <h2 class="h2" style="margin-top:16px;">Give it an animal ID. Get a report.</h2>
+      <p class="lede" style="margin-top:12px;">Ask VetAssist to generate a report for any animal or herd,
+        and it pulls everything on record for that entity — health history, breeding timeline, yield
+        trend, feed consumption — into one document.</p>
+      <ul class="feature-list">
+        <li><span class="ck">✓</span>Per-animal reports built entirely from your farm's own recorded data</li>
+        <li><span class="ck">✓</span>Per-herd or per-shed reports for group-level patterns</li>
+        <li><span class="ck">✓</span>When the data suggests a need, VetAssist researches diet plans or
+          treatment strategies and includes them as a recommendation</li>
+        <li><span class="ck">✓</span>Vets can request supporting research on any condition or symptom
+          directly, not just as part of a report</li>
+      </ul>
+    </div>
+    <div class="feature-visual">
+      <div class="timeline" style="border:none;">
+        <div class="timeline-item" style="padding:14px 0;">
+          <div class="t-year">1</div><div><h4 style="font-size:14px;">Give VetAssist an animal or herd ID</h4></div>
+        </div>
+        <div class="timeline-item" style="padding:14px 0;">
+          <div class="t-year">2</div><div><h4 style="font-size:14px;">It pulls every module's data for that entity</h4></div>
+        </div>
+        <div class="timeline-item" style="padding:14px 0; border-bottom:none;">
+          <div class="t-year">3</div><div><h4 style="font-size:14px;">Report generated, with research included if warranted</h4></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-row reveal" id="forecasting">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Forecasting &amp; analysis</span>
+      <h2 class="h2" style="margin-top:16px;">Historical analysis and forecasting, on request.</h2>
+      <p class="lede" style="margin-top:12px;">VetAssist isn't limited to animal health — ask it to
+        analyze trends or forecast forward, on the herd or the farm's finances.</p>
+      <ul class="feature-list">
+        <li><span class="ck">✓</span>Yield trend analysis for an animal, group, or the whole herd over any period</li>
+        <li><span class="ck">✓</span>Financial forecasting — projected milk revenue, feed cost trajectory, cash position</li>
+        <li><span class="ck">✓</span>Historical comparisons — this month vs. last, this season vs. last year</li>
+        <li><span class="ck">✓</span>Early flags when a pattern in the data looks worth a vet's attention</li>
+      </ul>
+    </div>
+    <div class="feature-visual">
+      <div class="mock-chart" style="height:200px;">
+        <i style="height:44%"></i><i style="height:48%"></i><i style="height:52%"></i><i style="height:58%"></i>
+        <i style="height:62%"></i><i style="height:60%"></i><i style="height:68%"></i><i style="height:74%"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-row reverse reveal" id="how-it-works">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>How it works</span>
+      <h2 class="h2" style="margin-top:16px;">Grounded in your data, not a guess.</h2>
+      <p class="lede" style="margin-top:12px;">VetAssist is a highly intelligent system that reads
+        directly from your farm's records before it answers — it doesn't answer from general knowledge
+        alone when your data has the actual answer.</p>
+      <ul class="feature-list">
+        <li><span class="ck">✓</span>Queries your farm's animal, milk, health, breeding, inventory and accounts data first</li>
+        <li><span class="ck">✓</span>Only reaches beyond your data — for diet science, disease research, treatment strategy — when the situation calls for it</li>
+        <li><span class="ck">✓</span>Every response is scoped to your tenant; VetAssist never sees another farm's data</li>
+        <li><span class="ck">✓</span>Available to any role with access to the underlying modules it's drawing from</li>
+      </ul>
+    </div>
+    <div class="feature-visual">
+      <div class="code-block">
+        <div class="cb-top"><span>Example</span><span>vetassist</span></div>
+        <pre><span class="tok-com"># You ask</span>
+<span class="tok-str">"Is COW-014 due for anything this week?"</span>
+
+<span class="tok-com"># VetAssist checks, in order</span>
+1. Animal record (status, group, shed)
+2. Health module (vaccination/deworming schedule)
+3. Breeding module (expected events)
+4. Milk module (recent yield trend)
+
+<span class="tok-com"># Then answers from what it found</span></pre>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ── FAQ ─────────────────────────────────────────────── -->
+<section class="section-pad" id="faq">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow"><span class="dot"></span>Common questions</span>
+      <h2 class="h2">About VetAssist.</h2>
+    </div>
+    <div class="grid grid-2 reveal">
+      <div class="card">
+        <h3>Does VetAssist replace my vet?</h3>
+        <p>No. VetAssist is built to help vets and farm owners understand their animals better — surfacing patterns, generating reports, and researching options — not to replace clinical judgment.</p>
+      </div>
+      <div class="card">
+        <h3>Can it see data from other farms?</h3>
+        <p>No. VetAssist only ever queries your farm's own tenant-isolated data, exactly like every other module in Dusuq ERP.</p>
+      </div>
+      <div class="card">
+        <h3>Who on my team can use VetAssist?</h3>
+        <p>Anyone whose role already grants access to the underlying modules — a vet can ask about health and breeding, an accountant can ask about finances, and an owner can ask about anything.</p>
+      </div>
+      <div class="card">
+        <h3>What does report generation actually pull from?</h3>
+        <p>Whatever is on record for that animal or herd in Dusuq ERP — health, breeding, milk and inventory history — plus researched recommendations when the data indicates a need.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA banner ──────────────────────────────────────── -->
+<section class="section-pad" style="padding-top:0;">
+  <div class="container">
+    <div class="cta-banner reveal">
+      <div>
+        <h2 class="h2">Try VetAssist on your own farm data.</h2>
+        <p class="lede" style="margin-top:12px;">Included with every Dusuq ERP account. No credit card required.</p>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="index.html" class="btn btn-primary btn-lg">Start Free Trial</a>
+        <a href="docs.html#vetassist-overview" class="btn btn-secondary btn-lg">Read the Docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <h3 class="h3">Get product updates.</h3>
+        <p class="lede" style="margin-top:8px; font-size:14px;">New modules, migration guides, and release notes — no spam.</p>
+      </div>
+      <form class="newsletter" onsubmit="return false;">
+        <input type="email" placeholder="you@farm.com" aria-label="Email address">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
+
+    <div class="footer-grid">
+      <div class="footer-col footer-brand">
+        <a href="index.html" class="brand"><span class="brand-mark">DQ</span>Dusuq ERP</a>
+        <p>Farm management software for modern dairy operations. A Dusuq product, built in Islamabad, Pakistan.</p>
+        <span class="badge badge-live" style="margin-top:18px;">All systems operational</span>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="features.html">Features</a></li>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="index.html#features">Overview</a></li>
+          <li><a href="roadmap.html">ERP v2.0 Roadmap</a></li>
+          <li><a href="#">Changelog <span class="tag">soon</span></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Solutions</h4>
+        <ul>
+          <li><a href="features.html#animals">Animal Records</a></li>
+          <li><a href="features.html#milk">Milk Production</a></li>
+          <li><a href="features.html#health">Health &amp; Vaccination</a></li>
+          <li><a href="features.html#breeding">Breeding &amp; Reproduction</a></li>
+          <li><a href="features.html#inventory">Inventory &amp; Feed</a></li>
+          <li><a href="features.html#accounts">Accounts &amp; Finance</a></li>
+          <li><a href="vetassist.html">VetAssist</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="docs.html">Documentation</a></li>
+          <li><a href="blog/index.html">Blog</a></li>
+          <li><a href="docs.html#api-authentication">API Reference</a></li>
+          <li><a href="contact.html#faq">FAQ</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About</a></li>
+          <li><a href="about.html#founder">Founder's Note</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="mailto:hello@dusuq.com">hello@dusuq.com</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Dusuq. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Security</a>
+      </div>
+      <div class="footer-social">
+        <a href="#" aria-label="LinkedIn">in</a>
+        <a href="#" aria-label="Twitter">X</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

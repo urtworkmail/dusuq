@@ -1,4 +1,4 @@
-# DairyCare — Local Development Guide (Docker Desktop)
+# Dusuq ERP — Local Development Guide (Docker Desktop)
 
 ## Prerequisites
 
@@ -10,8 +10,8 @@
 ## 1. Clone the repository
 
 ```bash
-git clone <your-repo-url> dairycare
-cd dairycare
+git clone <your-repo-url> dusuq-erp
+cd dusuq-erp
 ```
 
 ---
@@ -101,7 +101,7 @@ docker compose exec backend python manage.py setup_tasks
 
 | URL                          | What it is                        |
 |------------------------------|-----------------------------------|
-| http://localhost             | DairyCare web app (main entry)    |
+| http://localhost             | Dusuq ERP web app (main entry)      |
 | http://localhost/api/docs/   | Swagger API documentation         |
 | http://localhost/django-admin/ | Django admin panel              |
 

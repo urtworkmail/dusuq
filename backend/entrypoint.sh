@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-echo "=== DairyCare Backend Startup ==="
+echo "=== Dusuq ERP Backend Startup ==="
 
 echo "[1/5] Waiting for database..."
 until pg_isready -h "${DB_HOST:-db}" -p "${DB_PORT:-5432}" -U "${DB_USER:-dairycare}" -q; do

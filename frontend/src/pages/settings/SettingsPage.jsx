@@ -156,7 +156,7 @@ function SMTPTab() {
               <input type="email" {...register('from_email', { required: true })} className="form-input" />
             </FormField>
             <FormField label="From Name">
-              <input {...register('from_name')} className="form-input" placeholder="DairyCare" />
+              <input {...register('from_name')} className="form-input" placeholder="Dusuq ERP" />
             </FormField>
           </div>
 

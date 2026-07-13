@@ -163,6 +163,16 @@ export const notifAPI = {
   markOneRead:  (id)     => api.post(`/notifications/${id}/mark-read/`),
 }
 
+// ─── VetAssist ────────────────────────────────────────────────────────────────
+export const vetassistAPI = {
+  ask:            (data)   => api.post('/vetassist/query/', data),
+  listReports:    (params) => api.get('/vetassist/reports/', { params }),
+  createReport:   (data)   => api.post('/vetassist/reports/', data),
+  getReport:      (id)     => api.get(`/vetassist/reports/${id}/`),
+  forecast:       (data)   => api.post('/vetassist/forecast/', data),
+  history:        ()       => api.get('/vetassist/history/'),
+}
+
 // ─── Reports ──────────────────────────────────────────────────────────────────
 export const reportsAPI = {
   inseminations: (params) => api.get('/reports/inseminations/', { params }),
