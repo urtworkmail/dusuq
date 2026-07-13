@@ -95,15 +95,17 @@ DEBUG=False
 DB_PASSWORD=<strong-database-password>
 DB_HOST=db
 
-# The app's own host — not the marketing domain
-ALLOWED_HOSTS=erp.dusuq.com
+# The app's own host, plus the bare server IP (nginx falls back to serving the
+# app directly for any request that doesn't match dusuq.com / erp.dusuq.com —
+# see the "Bare IP access" block in nginx/nginx.prod.conf).
+ALLOWED_HOSTS=erp.dusuq.com,24.144.103.213
 
 # The marketing site is a different origin and calls the API cross-origin
 # (contact form, support tickets) — it needs to be CORS-allowed explicitly.
 CORS_ALLOWED_ORIGINS=https://dusuq.com,https://www.dusuq.com
 
 # Needed for Django admin logins to work behind the reverse proxy
-CSRF_TRUSTED_ORIGINS=https://erp.dusuq.com
+CSRF_TRUSTED_ORIGINS=https://erp.dusuq.com,http://24.144.103.213,https://24.144.103.213
 
 # Baked into the React build — same origin as the app itself
 VITE_API_URL=https://erp.dusuq.com
@@ -114,6 +116,8 @@ REDIS_URL=redis://redis:6379/0
 CELERY_BROKER_URL=redis://redis:6379/0
 CELERY_RESULT_BACKEND=redis://redis:6379/1
 
+# Optional — see note at the end of this guide. Leave blank to skip VetAssist
+# for now; every other module works fine without it.
 GEMINI_API_KEY=<your-gemini-api-key>
 ```
 
@@ -203,6 +207,15 @@ Open **https://dusuq.com** — you should see the marketing site. Submit the con
 form or a support ticket there to confirm the cross-origin call to erp.dusuq.com
 works (check `docker compose logs backend` if it doesn't — usually a CORS/env
 mismatch, see step 4).
+
+**Bare IP access:** `http://24.144.103.213` and `https://24.144.103.213` both work
+too — nginx falls back to serving the app directly for any request that isn't
+`dusuq.com` or `erp.dusuq.com`. This is mainly useful for testing before DNS
+propagates. The browser will show a certificate name-mismatch warning over
+HTTPS on the bare IP — that's expected (Let's Encrypt can't issue a cert for an
+IP address); click through it. To reach the *marketing* site by IP instead of
+the app, add a temporary hosts-file entry mapping `dusuq.com` to
+`24.144.103.213` on your own machine, rather than typing the IP directly.
 
 ---
 
@@ -310,4 +323,15 @@ docker compose logs nginx
 - [ ] SSL certificate active (`https://` works)
 - [ ] Firewall allows only 22, 80, 443
 - [ ] Daily database backups scheduled
+
+---
+
+## About GEMINI_API_KEY
+
+Leaving `GEMINI_API_KEY` blank is fine for launch. Every module — animals, milk,
+health, breeding, accounts, inventory, the marketing site, contact form, support
+tickets — works with no dependency on it. Only VetAssist's ask/report/forecast
+endpoints need it; without a key they return a `503` with a clear "not
+configured" message instead of failing the request in a confusing way. Add the
+key to `.env` later and restart the backend container — no other changes needed.
 - [ ] `.env` file not in git (`.gitignore` handles this)
