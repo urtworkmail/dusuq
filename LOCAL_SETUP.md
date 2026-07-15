@@ -42,6 +42,13 @@ python3 -c "import secrets; print(secrets.token_urlsafe(50))"
 docker compose up --build
 ```
 
+The ports below come from `docker-compose.override.yml`, which Compose loads
+automatically for plain `docker compose up` (no `-f` flags). Production
+deployment always passes explicit `-f` flags (see `VPS_DEPLOYMENT.md`), which
+makes Compose skip this file entirely — so these ports are dev-only by
+construction, not by convention. Don't add `ports:` back to the services in
+the base `docker-compose.yml`.
+
 This starts:
 | Service        | Port  | Description                         |
 |----------------|-------|-------------------------------------|

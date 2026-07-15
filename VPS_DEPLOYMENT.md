@@ -335,6 +335,20 @@ docker compose logs nginx
 - [ ] SSL certificate active (`https://` works)
 - [ ] Firewall allows only 22, 80, 443
 - [ ] Daily database backups scheduled
+- [ ] Only nginx's ports are published — verify after every deploy:
+
+```bash
+docker compose ps
+```
+
+Every service except `nginx` should show **no** `0.0.0.0:...->...` entries in
+the PORTS column — `db`, `redis`, `backend`, `celery`, `celery_beat`, and
+`frontend` are reachable only from other containers on the internal Docker
+network, never directly from the internet. Only `nginx` should list published
+ports (`80`, `443`). If you ever see `8000`, `5432`, `6379`, `5173`, or `8084`
+published here, something ran without both `-f` flags and picked up
+`docker-compose.override.yml`'s dev-only ports — re-run the deploy command
+from step 11 exactly as written.
 
 ---
 

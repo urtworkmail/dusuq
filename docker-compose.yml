@@ -12,8 +12,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
+    # No ports here — published only in docker-compose.override.yml (dev).
+    # See that file's comment for why this must not be done here.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dairycare"]
       interval: 10s
@@ -24,8 +24,7 @@ services:
     image: redis:7-alpine
     container_name: dusuq_erp_redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    # No ports here — see docker-compose.override.yml.
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -46,8 +45,7 @@ services:
       - ./backend:/app
       - static_files:/app/staticfiles
       - media_files:/app/media
-    ports:
-      - "8000:8000"
+    # No ports here — see docker-compose.override.yml.
     depends_on:
       db:
         condition: service_healthy
@@ -102,8 +100,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    ports:
-      - "5173:5173"
+    # No ports here — see docker-compose.override.yml.
     environment:
       - VITE_API_URL=http://localhost:8000
     depends_on:
@@ -113,8 +110,7 @@ services:
     image: nginx:1.25-alpine
     container_name: dusuq_erp_nginx
     restart: unless-stopped
-    ports:
-      - "8084:80"
+    # No ports here — see docker-compose.override.yml (dev) / docker-compose.prod.yml (prod).
     volumes:
       - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
       - static_files:/var/www/static

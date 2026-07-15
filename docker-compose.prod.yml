@@ -1,15 +1,18 @@
 version: "3.9"
 
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Passing explicit -f flags (as above) makes Compose skip auto-loading
+# docker-compose.override.yml — so none of that file's dev-only published
+# ports (db/redis/backend/frontend directly on the host) apply here. Only
+# nginx's ports below are ever published in production.
 
 services:
   db:
     restart: always
-    ports: []  # no external port in production
 
   redis:
     restart: always
-    ports: []
 
   backend:
     restart: always
@@ -22,7 +25,6 @@ services:
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
              gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120"
-    ports: []
 
   celery:
     restart: always
@@ -43,7 +45,6 @@ services:
         # nginx here, whether that origin is a domain or a bare IP. Only override
         # if the frontend is ever served from a different host than the API.
         VITE_API_URL: ${VITE_API_URL:-}
-    ports: []
     volumes: []  # prod image is self-contained (dist baked in); no dev bind-mounts
 
   nginx:
