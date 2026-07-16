@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, throttling
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import (
@@ -19,12 +19,34 @@ from .permissions import IsTenantOwner, IsSameTenant
 User = get_user_model()
 
 
+class LoginThrottle(throttling.AnonRateThrottle):
+    scope = "login"
+
+
+class RegisterThrottle(throttling.AnonRateThrottle):
+    scope = "register"
+
+
+class TokenRefreshThrottle(throttling.AnonRateThrottle):
+    scope = "token_refresh"
+
+
+class PasswordThrottle(throttling.UserRateThrottle):
+    scope = "password"
+
+
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    throttle_classes = [LoginThrottle]
+
+
+class ThrottledTokenRefreshView(TokenRefreshView):
+    throttle_classes = [TokenRefreshThrottle]
 
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [RegisterThrottle]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -90,6 +112,7 @@ class MeView(generics.RetrieveUpdateAPIView):
 
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [PasswordThrottle]
 
     def post(self, request):
         serializer = ChangePasswordSerializer(
@@ -137,6 +160,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ResetUserPasswordView(APIView):
     """Owner resets another user's password."""
     permission_classes = [permissions.IsAuthenticated, IsTenantOwner]
+    throttle_classes = [PasswordThrottle]
 
     def post(self, request):
         serializer = ResetPasswordSerializer(data=request.data)

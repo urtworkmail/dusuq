@@ -1,6 +1,7 @@
-from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from .models import Tenant
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework.exceptions import AuthenticationFailed
 
 EXEMPT_PATHS = (
     "/api/health/",
@@ -25,8 +26,12 @@ SUBSCRIPTION_EXEMPT_PATHS = (
 
 class TenantMiddleware:
     """
-    Resolves the current tenant from the X-Tenant-ID request header.
-    Sets request.tenant on every request that passes through.
+    Resolves the current tenant strictly from the authenticated user's own
+    tenant relation — never from a client-supplied header. A request's tenant
+    must never be attacker-choosable: trusting an X-Tenant-ID header here
+    previously let any authenticated user read/write any other tenant's data
+    (and, via IsTenantOwner-gated endpoints like password reset, take over
+    another tenant's account) just by sending a different UUID.
 
     Exempt paths (health check, auth, admin) bypass tenant resolution.
     Once resolved, also blocks the request if the tenant's trial or
@@ -36,6 +41,7 @@ class TenantMiddleware:
 
     def __init__(self, get_response):
         self.get_response = get_response
+        self.jwt_auth = JWTAuthentication()
 
     def __call__(self, request):
         # Skip exempt paths
@@ -44,17 +50,23 @@ class TenantMiddleware:
             request.tenant = None
             return self.get_response(request)
 
-        tenant_id = request.headers.get("X-Tenant-ID")
-        if not tenant_id:
+        try:
+            auth_result = self.jwt_auth.authenticate(request)
+        except (InvalidToken, TokenError, AuthenticationFailed):
+            auth_result = None
+
+        if auth_result is None:
             return JsonResponse(
-                {"detail": "X-Tenant-ID header is required."}, status=400
+                {"detail": "Authentication credentials were not provided or are invalid."},
+                status=401,
             )
 
-        try:
-            tenant = Tenant.objects.get(id=tenant_id, is_active=True)
-        except (Tenant.DoesNotExist, ValueError, ValidationError):
+        user, _ = auth_result
+        tenant = user.tenant
+        if tenant is None or not tenant.is_active:
             return JsonResponse(
-                {"detail": "Invalid or inactive tenant."}, status=403
+                {"detail": "No active tenant is associated with this account."},
+                status=403,
             )
 
         request.tenant = tenant

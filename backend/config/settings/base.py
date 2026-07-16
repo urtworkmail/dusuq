@@ -110,6 +110,10 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "contact": "10/hour",
         "tickets": "10/hour",
+        "login": "10/min",
+        "register": "5/hour",
+        "token_refresh": "30/min",
+        "password": "10/hour",
     },
 }
 
@@ -152,7 +156,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": env("DB_NAME", default="dairycare"),
         "USER": env("DB_USER", default="dairycare"),
-        "PASSWORD": env("DB_PASSWORD", default="dairycare_dev"),
+        "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST", default="db"),
         "PORT": env("DB_PORT", default="5432"),
         "CONN_MAX_AGE": 60,
