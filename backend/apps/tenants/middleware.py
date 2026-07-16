@@ -15,6 +15,13 @@ EXEMPT_PATHS = (
     "/api/public/",
 )
 
+# Paths a tenant must still be able to reach even once their trial/subscription
+# has lapsed — otherwise there's no way for them to see why, or to pay.
+SUBSCRIPTION_EXEMPT_PATHS = (
+    "/api/subscriptions/",
+    "/api/auth/",
+)
+
 
 class TenantMiddleware:
     """
@@ -22,6 +29,9 @@ class TenantMiddleware:
     Sets request.tenant on every request that passes through.
 
     Exempt paths (health check, auth, admin) bypass tenant resolution.
+    Once resolved, also blocks the request if the tenant's trial or
+    subscription has lapsed — see SUBSCRIPTION_EXEMPT_PATHS for what stays
+    reachable regardless.
     """
 
     def __init__(self, get_response):
@@ -48,4 +58,16 @@ class TenantMiddleware:
             )
 
         request.tenant = tenant
+
+        if not any(path.startswith(p) for p in SUBSCRIPTION_EXEMPT_PATHS):
+            subscription = getattr(tenant, "subscription", None)
+            if subscription is not None and not subscription.is_access_active:
+                return JsonResponse(
+                    {
+                        "detail": "Your trial or subscription has ended. Please choose a plan to continue.",
+                        "code": "subscription_inactive",
+                    },
+                    status=402,
+                )
+
         return self.get_response(request)

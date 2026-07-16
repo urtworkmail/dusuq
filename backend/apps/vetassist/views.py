@@ -3,6 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from apps.subscriptions.permissions import HasAIAccess
+from apps.subscriptions.services import record_ai_usage
 from . import context as ctx
 from . import gemini_client
 from .models import VetAssistQuery, VetAssistReport, VetAssistForecast, EntityType
@@ -29,7 +31,7 @@ def _sources_for(entity_type):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, HasAIAccess])
 def query(request):
     """Ask VetAssist a natural-language question, scoped to the requesting tenant."""
     req = VetAssistQueryRequestSerializer(data=request.data)
@@ -50,19 +52,23 @@ def query(request):
     )
 
     try:
-        answer = gemini_client.ask(data["question"], farm_context, allow_research=True)
+        answer, usage = gemini_client.ask(data["question"], farm_context, allow_research=True)
     except RuntimeError as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
     record.answer = answer
     record.used_external_research = True
     record.save(update_fields=["answer", "used_external_research"])
+    record_ai_usage(
+        request.tenant, request.user, "query",
+        usage["model"], usage["input_tokens"], usage["output_tokens"],
+    )
 
     return Response(VetAssistQuerySerializer(record).data)
 
 
 class ReportListCreateView(generics.ListCreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, HasAIAccess]
 
     def get_queryset(self):
         return VetAssistReport.objects.filter(tenant=self.request.tenant)
@@ -98,13 +104,17 @@ class ReportListCreateView(generics.ListCreateAPIView):
 
         label = ENTITY_LABEL[entity_type].format(id=entity_id or "")
         try:
-            content = gemini_client.generate_report(farm_context, label, data["include_research"])
+            content, usage = gemini_client.generate_report(farm_context, label, data["include_research"])
         except RuntimeError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         report.content = content
         report.used_external_research = data["include_research"]
         report.save(update_fields=["content", "used_external_research"])
+        record_ai_usage(
+            request.tenant, request.user, "report",
+            usage["model"], usage["input_tokens"], usage["output_tokens"],
+        )
 
         return Response(VetAssistReportSerializer(report).data, status=status.HTTP_201_CREATED)
 
@@ -118,7 +128,7 @@ class ReportDetailView(generics.RetrieveAPIView):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, HasAIAccess])
 def forecast(request):
     """Generate a forecast / historical analysis for a metric and scope."""
     req = VetAssistForecastRequestSerializer(data=request.data)
@@ -140,7 +150,7 @@ def forecast(request):
 
     scope_label = ENTITY_LABEL[scope].format(id=scope_id or "")
     try:
-        content = gemini_client.generate_forecast(
+        content, usage = gemini_client.generate_forecast(
             farm_context, data["metric"], scope_label, data["horizon_days"]
         )
     except RuntimeError as exc:
@@ -148,6 +158,10 @@ def forecast(request):
 
     record.content = content
     record.save(update_fields=["content"])
+    record_ai_usage(
+        request.tenant, request.user, "forecast",
+        usage["model"], usage["input_tokens"], usage["output_tokens"],
+    )
 
     return Response(VetAssistForecastSerializer(record).data, status=status.HTTP_201_CREATED)
 

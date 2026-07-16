@@ -33,6 +33,7 @@ class RegisterView(APIView):
 
         # Issue tokens immediately after registration
         refresh = RefreshToken.for_user(user)
+        subscription = getattr(tenant, "subscription", None)
         return Response(
             {
                 "access": str(refresh.access_token),
@@ -46,6 +47,18 @@ class RegisterView(APIView):
                     "tenant_id": str(tenant.id),
                     "tenant_name": tenant.name,
                 },
+                "subscription": (
+                    {
+                        "status": subscription.status,
+                        "plan": None,
+                        "is_trialing": subscription.is_trialing,
+                        "trial_days_left": subscription.trial_days_left,
+                        "is_ai_enabled": subscription.is_ai_enabled,
+                        "is_access_active": subscription.is_access_active,
+                    }
+                    if subscription
+                    else None
+                ),
             },
             status=status.HTTP_201_CREATED,
         )

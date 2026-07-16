@@ -1,9 +1,13 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
+from datetime import timedelta
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.tenants.models import Tenant
+from apps.subscriptions.models import Subscription, SubscriptionStatus
 from .models import Role
 
 User = get_user_model()
@@ -24,6 +28,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             "tenant_id": str(user.tenant_id) if user.tenant_id else None,
             "tenant_name": user.tenant.name if user.tenant else None,
         }
+        subscription = getattr(user.tenant, "subscription", None) if user.tenant else None
+        data["subscription"] = (
+            {
+                "status": subscription.status,
+                "plan": subscription.plan.slug if subscription.plan else None,
+                "is_trialing": subscription.is_trialing,
+                "trial_days_left": subscription.trial_days_left,
+                "is_ai_enabled": subscription.is_ai_enabled,
+                "is_access_active": subscription.is_access_active,
+            }
+            if subscription
+            else None
+        )
         return data
 
 
@@ -71,6 +88,13 @@ class RegisterSerializer(serializers.Serializer):
             phone=validated_data.get("phone", ""),
             role=Role.OWNER,
             tenant=tenant,
+        )
+        # 15-day free trial, no plan yet, no AI (Subscription.is_ai_enabled is
+        # False for any trialing subscription regardless of plan).
+        Subscription.objects.create(
+            tenant=tenant,
+            status=SubscriptionStatus.TRIALING,
+            trial_end=timezone.now() + timedelta(days=settings.TRIAL_PERIOD_DAYS),
         )
         return user, tenant
 

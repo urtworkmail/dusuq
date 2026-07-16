@@ -51,14 +51,22 @@ def _build_prompt(question, context, allow_research):
 
 def ask(question, context, allow_research=True):
     """
-    Send a question plus its farm-data context to Gemini and return the answer text.
+    Send a question plus its farm-data context to Gemini. Returns
+    (answer_text, usage) where usage is {"model": str, "input_tokens": int,
+    "output_tokens": int} — the actual token counts Gemini billed for this
+    call, used downstream to compute the AI usage surcharge.
     Raises RuntimeError if GEMINI_API_KEY isn't configured.
     """
     model = _get_model()
     prompt = _build_prompt(question, context, allow_research)
     try:
         response = model.generate_content(prompt)
-        return (response.text or "").strip()
+        usage = getattr(response, "usage_metadata", None)
+        return (response.text or "").strip(), {
+            "model": settings.GEMINI_MODEL,
+            "input_tokens": getattr(usage, "prompt_token_count", 0) or 0,
+            "output_tokens": getattr(usage, "candidates_token_count", 0) or 0,
+        }
     except Exception:
         logger.exception("VetAssist Gemini request failed")
         raise

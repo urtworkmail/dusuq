@@ -60,6 +60,7 @@ LOCAL_APPS = [
     "apps.contact",
     "apps.tickets",
     "apps.vetassist",
+    "apps.subscriptions",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -192,3 +193,15 @@ SPECTACULAR_SETTINGS = {
 # ─── VetAssist (Gemini API) ─────────────────────────────────────────────────────
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.0-flash")
+
+# Cost per 1M tokens in USD, used to compute the AI usage surcharge billed to
+# tenants. These are NOT hardcoded to a remembered price on purpose — Gemini's
+# published pricing changes and varies by model. Check the current rate for
+# GEMINI_MODEL at https://ai.google.dev/pricing and set these two values to
+# match before relying on AIUsageRecord.api_cost_usd for real billing.
+GEMINI_INPUT_COST_PER_1M_TOKENS = env.float("GEMINI_INPUT_COST_PER_1M_TOKENS", default=0.0)
+GEMINI_OUTPUT_COST_PER_1M_TOKENS = env.float("GEMINI_OUTPUT_COST_PER_1M_TOKENS", default=0.0)
+
+# ─── Billing ────────────────────────────────────────────────────────────────────
+AI_USAGE_SURCHARGE_PERCENT = env.float("AI_USAGE_SURCHARGE_PERCENT", default=25.0)
+TRIAL_PERIOD_DAYS = env.int("TRIAL_PERIOD_DAYS", default=15)
