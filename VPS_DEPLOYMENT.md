@@ -98,14 +98,14 @@ DB_HOST=db
 # The app's own host, plus the bare server IP (nginx falls back to serving the
 # app directly for any request that doesn't match dusuq.com / app.dusuq.com —
 # see the "Bare IP access" block in nginx/nginx.prod.conf).
-ALLOWED_HOSTS=app.dusuq.com,24.144.103.213
+ALLOWED_HOSTS=app.dusuq.com,136.114.190.8
 
 # The marketing site is a different origin and calls the API cross-origin
 # (contact form, support tickets) — it needs to be CORS-allowed explicitly.
 CORS_ALLOWED_ORIGINS=https://dusuq.com,https://www.dusuq.com
 
 # Needed for Django admin logins to work behind the reverse proxy
-CSRF_TRUSTED_ORIGINS=https://app.dusuq.com,http://24.144.103.213,https://24.144.103.213
+CSRF_TRUSTED_ORIGINS=https://app.dusuq.com,http://136.114.190.8,https://136.114.190.8
 
 # Baked into the React build — same origin as the app itself
 VITE_API_URL=https://app.dusuq.com
@@ -208,14 +208,14 @@ form or a support ticket there to confirm the cross-origin call to app.dusuq.com
 works (check `docker compose logs backend` if it doesn't — usually a CORS/env
 mismatch, see step 4).
 
-**Bare IP access:** `http://24.144.103.213` and `https://24.144.103.213` both work
+**Bare IP access:** `http://136.114.190.8` and `https://136.114.190.8` both work
 too — nginx falls back to serving the app directly for any request that isn't
 `dusuq.com` or `app.dusuq.com`. This is mainly useful for testing before DNS
 propagates. The browser will show a certificate name-mismatch warning over
 HTTPS on the bare IP — that's expected (Let's Encrypt can't issue a cert for an
 IP address); click through it. To reach the *marketing* site by IP instead of
 the app, add a temporary hosts-file entry mapping `dusuq.com` to
-`24.144.103.213` on your own machine, rather than typing the IP directly.
+`136.114.190.8` on your own machine, rather than typing the IP directly.
 
 ---
 
