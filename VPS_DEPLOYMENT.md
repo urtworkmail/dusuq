@@ -5,7 +5,7 @@ Estimated time: 30–45 minutes
 
 This deploys two domains from one stack:
 - **dusuq.com** (+ www) — the static marketing site
-- **erp.dusuq.com** — the app (React frontend + Django API)
+- **app.dusuq.com** — the app (React frontend + Django API)
 
 `nginx/nginx.prod.conf` is already configured for exactly these two hostnames — no
 templating step needed. If you're deploying to different domains, edit that file
@@ -23,10 +23,10 @@ dusuq.com is managed), pointing at your VPS's public IP:
 |------|------|-------|
 | A | `dusuq.com` (or `@`) | `<vps-ip>` |
 | A | `www.dusuq.com` | `<vps-ip>` |
-| A | `erp.dusuq.com` | `<vps-ip>` |
+| A | `app.dusuq.com` | `<vps-ip>` |
 
 DNS propagation can take a few minutes to a few hours. Certbot (step 5) will fail
-until these resolve — check with `dig +short erp.dusuq.com` before proceeding.
+until these resolve — check with `dig +short app.dusuq.com` before proceeding.
 
 ---
 
@@ -96,19 +96,19 @@ DB_PASSWORD=<strong-database-password>
 DB_HOST=db
 
 # The app's own host, plus the bare server IP (nginx falls back to serving the
-# app directly for any request that doesn't match dusuq.com / erp.dusuq.com —
+# app directly for any request that doesn't match dusuq.com / app.dusuq.com —
 # see the "Bare IP access" block in nginx/nginx.prod.conf).
-ALLOWED_HOSTS=erp.dusuq.com,24.144.103.213
+ALLOWED_HOSTS=app.dusuq.com,24.144.103.213
 
 # The marketing site is a different origin and calls the API cross-origin
 # (contact form, support tickets) — it needs to be CORS-allowed explicitly.
 CORS_ALLOWED_ORIGINS=https://dusuq.com,https://www.dusuq.com
 
 # Needed for Django admin logins to work behind the reverse proxy
-CSRF_TRUSTED_ORIGINS=https://erp.dusuq.com,http://24.144.103.213,https://24.144.103.213
+CSRF_TRUSTED_ORIGINS=https://app.dusuq.com,http://24.144.103.213,https://24.144.103.213
 
 # Baked into the React build — same origin as the app itself
-VITE_API_URL=https://erp.dusuq.com
+VITE_API_URL=https://app.dusuq.com
 
 SSL_EMAIL=admin@dusuq.com
 
@@ -137,7 +137,7 @@ sudo apt install certbot -y
 sudo certbot certonly --standalone \
   -d dusuq.com \
   -d www.dusuq.com \
-  -d erp.dusuq.com \
+  -d app.dusuq.com \
   --email admin@dusuq.com \
   --agree-tos \
   --non-interactive
@@ -193,7 +193,7 @@ docker compose exec backend python manage.py setup_tasks
 
 ```bash
 # Check API health (via the app domain)
-curl https://erp.dusuq.com/api/health/
+curl https://app.dusuq.com/api/health/
 
 # Expected response:
 # {"status": "ok", "db": true}
@@ -202,15 +202,15 @@ curl https://erp.dusuq.com/api/health/
 curl -I https://dusuq.com/
 ```
 
-Open **https://erp.dusuq.com** in your browser — you should see the Dusuq ERP login page.
+Open **https://app.dusuq.com** in your browser — you should see the Dusuq ERP login page.
 Open **https://dusuq.com** — you should see the marketing site. Submit the contact
-form or a support ticket there to confirm the cross-origin call to erp.dusuq.com
+form or a support ticket there to confirm the cross-origin call to app.dusuq.com
 works (check `docker compose logs backend` if it doesn't — usually a CORS/env
 mismatch, see step 4).
 
 **Bare IP access:** `http://24.144.103.213` and `https://24.144.103.213` both work
 too — nginx falls back to serving the app directly for any request that isn't
-`dusuq.com` or `erp.dusuq.com`. This is mainly useful for testing before DNS
+`dusuq.com` or `app.dusuq.com`. This is mainly useful for testing before DNS
 propagates. The browser will show a certificate name-mismatch warning over
 HTTPS on the bare IP — that's expected (Let's Encrypt can't issue a cert for an
 IP address); click through it. To reach the *marketing* site by IP instead of

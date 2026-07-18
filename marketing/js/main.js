@@ -1,7 +1,7 @@
 // API base for the marketing site's public endpoints (contact form, support tickets).
-// The marketing site (dusuq.com) and the app/API (erp.dusuq.com) are different origins,
+// The marketing site (dusuq.com) and the app/API (app.dusuq.com) are different origins,
 // so this must point at the app host. Override via window.DUSUQ_API_BASE if needed.
-const DUSUQ_API_BASE = window.DUSUQ_API_BASE || 'https://erp.dusuq.com';
+const DUSUQ_API_BASE = window.DUSUQ_API_BASE || 'https://app.dusuq.com';
 
 // Mobile nav toggle
 document.addEventListener('DOMContentLoaded', () => {
