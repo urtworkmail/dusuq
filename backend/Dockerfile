@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     curl \
     procps \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -23,11 +24,16 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Create non-root user
+# Create non-root user. The container starts as root (see entrypoint.sh) so
+# it can fix ownership of the static_files/media_files named volumes at
+# startup — those get mounted *inside* the bind-mounted /app in production,
+# so Docker's usual "copy ownership from image" volume init never applies to
+# them, they're always created root:root on first use. entrypoint.sh chowns
+# them, then drops to appuser via gosu before exec'ing the actual server
+# process — the code that handles untrusted requests never runs as root.
 RUN adduser --disabled-password --gecos '' appuser \
     && chown -R appuser:appuser /app \
     && chmod +x /app/entrypoint.sh
-USER appuser
 
 EXPOSE 8000
 
