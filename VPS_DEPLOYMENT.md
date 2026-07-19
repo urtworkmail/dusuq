@@ -129,12 +129,23 @@ One certificate covering all three hostnames — nginx.prod.conf references it a
 `/etc/letsencrypt/live/dusuq.com/` (the first `-d` flag becomes the certificate's
 directory name) from both the marketing and app server blocks.
 
+Uses the **webroot** method, not `--standalone` — both nginx configs already serve
+`/.well-known/acme-challenge/` from `/var/www/certbot` (mounted from `./certbot-webroot`
+in `docker-compose.prod.yml`), so certbot can issue and renew certs with nginx running
+the whole time. No downtime, and no port-80 conflict on renewal (which `--standalone`
+would hit, since it needs port 80 free and nginx is always holding it in production).
+
 ```bash
 # Install Certbot
 sudo apt install certbot -y
 
-# Make sure nginx is NOT running yet — port 80 must be free for the ACME challenge
-sudo certbot certonly --standalone \
+mkdir -p /opt/dusuq-erp/certbot-webroot
+
+# nginx must already be running (any config — nginx.no-ssl.conf is fine for this
+# first issuance if you haven't switched to nginx.prod.conf yet) so it can serve
+# the challenge files certbot drops into certbot-webroot.
+sudo certbot certonly --webroot \
+  -w /opt/dusuq-erp/certbot-webroot \
   -d dusuq.com \
   -d www.dusuq.com \
   -d app.dusuq.com \
@@ -143,6 +154,19 @@ sudo certbot certonly --standalone \
   --non-interactive
 
 # Certificate saved to: /etc/letsencrypt/live/dusuq.com/
+
+# Auto-restart nginx after every renewal so it actually picks up the new cert
+# (Debian's certbot package sets up a systemd timer for the renewal itself —
+# this hook just makes sure nginx reloads the result):
+sudo mkdir -p /etc/letsencrypt/renewal-hooks/deploy
+sudo tee /etc/letsencrypt/renewal-hooks/deploy/restart-nginx.sh > /dev/null << 'HOOK'
+#!/bin/sh
+docker compose -f /opt/dusuq-erp/docker-compose.yml -f /opt/dusuq-erp/docker-compose.prod.yml restart nginx
+HOOK
+sudo chmod +x /etc/letsencrypt/renewal-hooks/deploy/restart-nginx.sh
+
+# Confirm the whole renewal path works end-to-end without actually renewing:
+sudo certbot renew --dry-run
 ```
 
 ---
@@ -221,17 +245,13 @@ the app, add a temporary hosts-file entry mapping `dusuq.com` to
 
 ## 9. Auto-renew SSL certificates
 
+Already set up in step 5 — Debian/Ubuntu's `certbot` package installs a systemd timer
+(`certbot.timer`) that runs `certbot renew` automatically (twice daily, only actually
+renews within ~30 days of expiry), and the deploy hook restarts nginx afterward so it
+picks up the renewed cert. Nothing further to do here. Confirm the timer is active:
+
 ```bash
-# Test renewal
-sudo certbot renew --dry-run
-
-# Add cron job for auto-renewal
-sudo crontab -e
-```
-
-Add this line:
-```
-0 3 * * * certbot renew --quiet && docker compose -f /opt/dusuq-erp/docker-compose.yml -f /opt/dusuq-erp/docker-compose.prod.yml restart nginx
+systemctl status certbot.timer
 ```
 
 ---

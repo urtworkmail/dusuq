@@ -61,3 +61,9 @@ services:
       - static_files:/var/www/static
       - media_files:/var/www/media
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      # certbot's webroot authenticator drops ACME challenge files here; nginx
+      # serves them straight off disk via the /.well-known/acme-challenge/
+      # location in every port-80 server block. This lets certbot renew
+      # without ever needing to stop nginx (unlike --standalone, which needs
+      # port 80 free and can't coexist with an always-running nginx).
+      - ./certbot-webroot:/var/www/certbot:ro
