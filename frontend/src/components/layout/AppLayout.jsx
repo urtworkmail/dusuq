@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import NotificationBell from '@/components/layout/NotificationBell'
+import AlertBar from '@/components/layout/AlertBar'
 import GuidedTour from '@/components/onboarding/GuidedTour'
 import OnboardingChecklist from '@/components/onboarding/OnboardingChecklist'
 import {
@@ -104,49 +105,54 @@ export default function AppLayout() {
   )
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-60 bg-primary-600 flex-shrink-0">
-        <Sidebar />
-      </aside>
+    <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
+      {/* Announcement/alert strip — spans the full app width, above the sidebar too */}
+      <AlertBar />
 
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 flex">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-          <div className="relative z-50 flex flex-col w-64 bg-primary-600 h-full shadow-2xl">
-            <Sidebar mobile />
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:flex flex-col w-60 bg-primary-600 flex-shrink-0">
+          <Sidebar />
+        </aside>
+
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div className="lg:hidden fixed inset-0 z-40 flex">
+            <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
+            <div className="relative z-50 flex flex-col w-64 bg-primary-600 h-full shadow-2xl">
+              <Sidebar mobile />
+            </div>
           </div>
+        )}
+
+        {/* Main content */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {/* Topbar */}
+          <header className="flex items-center gap-3 px-4 lg:px-6 py-3 bg-white border-b border-gray-100 flex-shrink-0">
+            <button
+              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu size={20} />
+            </button>
+
+            {/* Breadcrumb placeholder — filled by pages via document.title */}
+            <div className="flex-1 min-w-0" />
+
+            <NotificationBell />
+
+            <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+              <span className="font-medium">{user?.first_name}</span>
+              <span className="text-gray-300">|</span>
+              <span className="capitalize text-xs bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full">{user?.role}</span>
+            </div>
+          </header>
+
+          {/* Page content */}
+          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+            <Outlet />
+          </main>
         </div>
-      )}
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Topbar */}
-        <header className="flex items-center gap-3 px-4 lg:px-6 py-3 bg-white border-b border-gray-100 flex-shrink-0">
-          <button
-            className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu size={20} />
-          </button>
-
-          {/* Breadcrumb placeholder — filled by pages via document.title */}
-          <div className="flex-1 min-w-0" />
-
-          <NotificationBell />
-
-          <div className="hidden sm:flex items-center gap-2 text-sm text-gray-600">
-            <span className="font-medium">{user?.first_name}</span>
-            <span className="text-gray-300">|</span>
-            <span className="capitalize text-xs bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full">{user?.role}</span>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <Outlet />
-        </main>
       </div>
 
       <GuidedTour />
