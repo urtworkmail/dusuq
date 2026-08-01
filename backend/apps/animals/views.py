@@ -10,7 +10,13 @@ from .serializers import AnimalListSerializer, AnimalDetailSerializer, AnimalCre
 
 
 class AnimalFilter(django_filters.FilterSet):
-    status = django_filters.MultipleChoiceFilter(choices=AnimalStatus.choices)
+    # CSVWidget so `?status=open,inseminated,heifer` (a single comma-joined
+    # value, which is what the frontend actually sends) is split into
+    # multiple choices — MultipleChoiceFilter's default widget only accepts
+    # repeated params (?status=open&status=inseminated) and 400s otherwise.
+    status = django_filters.MultipleChoiceFilter(
+        choices=AnimalStatus.choices, widget=django_filters.widgets.CSVWidget
+    )
     shed = django_filters.NumberFilter(field_name="shed__id")
     group = django_filters.NumberFilter(field_name="group__id")
     breed = django_filters.NumberFilter(field_name="breed__id")
