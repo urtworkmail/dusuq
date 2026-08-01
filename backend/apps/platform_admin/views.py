@@ -304,8 +304,13 @@ class PlatformUserListView(generics.ListAPIView):
 
 
 class PlanListCreateView(generics.ListCreateAPIView):
+    """
+    Unpaginated on purpose — a handful of pricing tiers, meant to be seen and
+    edited all at once, not paged through like Farms/Users/Transactions.
+    """
     permission_classes = [IsPlatformAdmin]
     serializer_class = PlanAdminSerializer
+    pagination_class = None
 
     def get_queryset(self):
         from apps.subscriptions.models import Plan
