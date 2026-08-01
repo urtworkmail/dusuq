@@ -14,6 +14,10 @@ EXEMPT_PATHS = (
     "/static/",
     "/media/",
     "/api/public/",
+    # Platform (SaaS owner) admin deliberately operates across every tenant —
+    # it enforces its own access control (IsPlatformAdmin, superuser-only) at
+    # the view/permission level rather than being scoped to one tenant here.
+    "/api/platform-admin/",
 )
 
 # Paths a tenant must still be able to reach even once their trial/subscription

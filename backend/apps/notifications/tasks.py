@@ -14,10 +14,13 @@ def run_daily_alerts(self):
     """Master task: dispatches all daily alert sub-tasks."""
     check_calving_due.delay()
     check_pregnancy_check_due.delay()
+    check_dry_off_due.delay()
+    check_close_up_due.delay()
     check_vaccination_due.delay()
     check_deworming_due.delay()
     check_treatment_followups.delay()
     check_low_stock.delay()
+    check_milk_drop.delay()
 
 
 @shared_task
@@ -79,6 +82,77 @@ def check_pregnancy_check_due():
                 ),
                 link=f"/reproduction/animals/{ins.animal_id}/",
             )
+
+
+@shared_task
+def check_dry_off_due():
+    """
+    Standard dairy practice: dry off ~60 days before expected calving (a
+    ~60-day dry period ahead of a ~305-day lactation). Alerts once the
+    animal's expected calving date is 55-62 days out and it hasn't already
+    been dried off for this pregnancy.
+    """
+    from apps.tenants.models import Tenant
+    from apps.reproduction.models import Insemination
+    from apps.notifications.service import broadcast_to_roles
+    from apps.notifications.models import NotificationType
+
+    today = date.today()
+
+    for tenant in Tenant.objects.filter(is_active=True):
+        for ins in Insemination.objects.filter(
+            tenant=tenant, animal__status="pregnant"
+        ).select_related("animal"):
+            ecd = ins.expected_calving_date
+            days_to_calving = (ecd - today).days
+            if 55 <= days_to_calving <= 62:
+                broadcast_to_roles(
+                    tenant=tenant,
+                    roles=["owner", "manager", "veterinary"],
+                    notif_type=NotificationType.DRY_OFF_DUE,
+                    title=f"Dry-off Due: {ins.animal.display_name}",
+                    message=(
+                        f"{ins.animal.display_name} (Tag: {ins.animal.tag_number}) "
+                        f"should be dried off soon — expected calving on {ecd} "
+                        f"({days_to_calving} day(s) away)."
+                    ),
+                    link=f"/reproduction/animals/{ins.animal_id}/",
+                )
+
+
+@shared_task
+def check_close_up_due():
+    """
+    The close-up period is the ~3-week pre-calving transition window needing
+    special feeding/monitoring. Alerts once the animal enters that window
+    (expected calving 18-21 days out).
+    """
+    from apps.tenants.models import Tenant
+    from apps.reproduction.models import Insemination
+    from apps.notifications.service import broadcast_to_roles
+    from apps.notifications.models import NotificationType
+
+    today = date.today()
+
+    for tenant in Tenant.objects.filter(is_active=True):
+        for ins in Insemination.objects.filter(
+            tenant=tenant, animal__status="pregnant"
+        ).select_related("animal"):
+            ecd = ins.expected_calving_date
+            days_to_calving = (ecd - today).days
+            if 18 <= days_to_calving <= 21:
+                broadcast_to_roles(
+                    tenant=tenant,
+                    roles=["owner", "manager", "veterinary"],
+                    notif_type=NotificationType.CLOSE_UP_DUE,
+                    title=f"Close-up Period Starting: {ins.animal.display_name}",
+                    message=(
+                        f"{ins.animal.display_name} (Tag: {ins.animal.tag_number}) "
+                        f"is entering the close-up (pre-calving transition) period — "
+                        f"expected calving on {ecd} ({days_to_calving} day(s) away)."
+                    ),
+                    link=f"/reproduction/animals/{ins.animal_id}/",
+                )
 
 
 @shared_task
@@ -204,4 +278,61 @@ def check_low_stock():
                         f"(reorder level: {product.reorder_level} {product.unit})."
                     ),
                     link="/inventory/",
+                )
+
+
+@shared_task
+def check_milk_drop():
+    """
+    Flags animals whose recent milk yield has dropped sharply — average of
+    the last 3 days vs. the preceding 7-day baseline, alerting on a >20% drop.
+    Requires at least 2 records in each window to avoid noise from animals
+    with sparse data (e.g. just calved, or milking not yet logged today).
+    """
+    from django.db.models import Avg, Count
+    from apps.tenants.models import Tenant
+    from apps.animals.models import Animal, AnimalStatus
+    from apps.milk.models import MilkRecord
+    from apps.notifications.service import broadcast_to_roles
+    from apps.notifications.models import NotificationType
+
+    today = date.today()
+    recent_start = today - timedelta(days=3)
+    baseline_start = today - timedelta(days=10)
+    baseline_end = today - timedelta(days=4)
+
+    for tenant in Tenant.objects.filter(is_active=True):
+        animals = Animal.objects.filter(
+            tenant=tenant, is_active=True,
+            status__in=[AnimalStatus.OPEN, AnimalStatus.INSEMINATED, AnimalStatus.PREGNANT],
+        )
+        for animal in animals:
+            recent = MilkRecord.objects.filter(
+                tenant=tenant, animal=animal, date__gte=recent_start, date__lte=today
+            ).aggregate(avg=Avg("litres"), n=Count("id"))
+            baseline = MilkRecord.objects.filter(
+                tenant=tenant, animal=animal, date__gte=baseline_start, date__lte=baseline_end
+            ).aggregate(avg=Avg("litres"), n=Count("id"))
+
+            if recent["n"] < 2 or baseline["n"] < 2 or not baseline["avg"]:
+                continue
+
+            recent_avg = float(recent["avg"])
+            baseline_avg = float(baseline["avg"])
+            if baseline_avg <= 0:
+                continue
+
+            drop_percent = (baseline_avg - recent_avg) / baseline_avg * 100
+            if drop_percent >= 20:
+                broadcast_to_roles(
+                    tenant=tenant,
+                    roles=["owner", "manager", "veterinary"],
+                    notif_type=NotificationType.MILK_DROP,
+                    title=f"Milk Drop: {animal.display_name}",
+                    message=(
+                        f"{animal.display_name} (Tag: {animal.tag_number}) yield has dropped "
+                        f"{drop_percent:.0f}% — averaging {recent_avg:.1f}L/session recently "
+                        f"vs {baseline_avg:.1f}L/session baseline."
+                    ),
+                    link=f"/animals/{animal.id}/",
                 )

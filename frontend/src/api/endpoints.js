@@ -43,6 +43,7 @@ export const animalAPI = {
   update:  (id, data) => api.patch(`/animals/${id}/`, data),
   delete:  (id)     => api.delete(`/animals/${id}/`),
   summary: ()       => api.get('/animals/summary/'),
+  pedigree: (id)    => api.get(`/animals/${id}/pedigree/`),
 }
 
 // ─── Reproduction ─────────────────────────────────────────────────────────────
@@ -123,6 +124,7 @@ export const milkAPI = {
 export const accountsAPI = {
   dashboard:  ()       => api.get('/accounts/dashboard/'),
   trialBalance: (params) => api.get('/accounts/trial-balance/', { params }),
+  balanceSheet: (params) => api.get('/accounts/balance-sheet/', { params }),
   pnl:        (params) => api.get('/accounts/profit-and-loss/', { params }),
   ledger:     (params) => api.get('/accounts/ledger/', { params }),
 
@@ -140,6 +142,29 @@ export const accountsAPI = {
   updateAsset: (id, data) => api.patch(`/accounts/assets/${id}/`, data),
 }
 
+// ─── Payroll ──────────────────────────────────────────────────────────────────
+export const payrollAPI = {
+  dashboard: () => api.get('/payroll/dashboard/'),
+
+  listEmployees:  ()     => api.get('/payroll/employees/'),
+  createEmployee: (data) => api.post('/payroll/employees/', data),
+  updateEmployee: (id, data) => api.patch(`/payroll/employees/${id}/`, data),
+  ledger:         (employeeId) => api.get(`/payroll/employees/${employeeId}/ledger/`),
+
+  listPayments:  (params) => api.get('/payroll/salary-payments/', { params }),
+  createPayment: (data)   => api.post('/payroll/salary-payments/', data),
+
+  listAdvances:  (params) => api.get('/payroll/advances/', { params }),
+  createAdvance: (data)   => api.post('/payroll/advances/', data),
+}
+
+// ─── Platform Admin (SaaS owner, superuser-only) ───────────────────────────────
+export const platformAdminAPI = {
+  dashboard: () => api.get('/platform-admin/dashboard/'),
+  live:      () => api.get('/platform-admin/live/'),
+  auditLog:  (params) => api.get('/platform-admin/audit-log/', { params }),
+}
+
 // ─── Inventory ────────────────────────────────────────────────────────────────
 export const inventoryAPI = {
   dashboard: ()       => api.get('/inventory/dashboard/'),
@@ -153,6 +178,11 @@ export const inventoryAPI = {
 
   listConsumptions:  (params) => api.get('/inventory/consumption/', { params }),
   createConsumption: (data)   => api.post('/inventory/consumption/', data),
+
+  listFeedRations:  ()     => api.get('/inventory/feed-rations/'),
+  createFeedRation: (data) => api.post('/inventory/feed-rations/', data),
+  updateFeedRation: (id, data) => api.patch(`/inventory/feed-rations/${id}/`, data),
+  feedPlanSummary:  ()     => api.get('/inventory/feed-plan-summary/'),
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────
@@ -185,6 +215,8 @@ export const reportsAPI = {
   transactions:  (params) => api.get('/reports/transactions/', { params }),
   stock:         (params) => api.get('/reports/stock/', { params }),
   consumption:   (params) => api.get('/reports/consumption/', { params }),
+  forecast:      (params) => api.get('/reports/forecast/', { params }),
+  herdGrowth:    ()       => api.get('/reports/herd-growth-projection/'),
 
   downloadExcel: (endpoint, params) =>
     api.get(endpoint, { params: { ...params, format: 'excel' }, responseType: 'blob' }),

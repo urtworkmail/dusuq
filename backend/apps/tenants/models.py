@@ -15,6 +15,8 @@ class Tenant(models.Model):
     phone = models.CharField(max_length=30, blank=True)
     address = models.TextField(blank=True)
     city = models.CharField(max_length=100, blank=True)
+    district = models.CharField(max_length=100, blank=True)
+    province = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, default="Pakistan")
     logo = models.ImageField(upload_to="tenant_logos/", null=True, blank=True)
 

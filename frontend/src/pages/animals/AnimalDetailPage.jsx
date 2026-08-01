@@ -5,6 +5,39 @@ import { PageSpinner, StatusBadge } from '@/components/ui'
 import { ArrowLeft, Beef } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
+function PedigreeNode({ node, role }) {
+  if (!node) {
+    return (
+      <div className="pl-3 border-l-2 border-gray-100 py-1">
+        <span className="text-xs text-gray-300 italic">{role} — unknown</span>
+      </div>
+    )
+  }
+  if (node.unregistered) {
+    return (
+      <div className="pl-3 border-l-2 border-gray-100 py-1">
+        <span className="text-xs text-gray-500">{role}: <span className="font-medium">{node.tag_number}</span> <span className="text-gray-400">(not in system)</span></span>
+      </div>
+    )
+  }
+  return (
+    <div className="pl-3 border-l-2 border-primary-100 py-1">
+      <span className="text-sm">
+        <span className="text-xs text-gray-400">{role}: </span>
+        <Link to={`/animals/${node.id}`} className="font-medium text-primary-700 hover:underline">
+          {node.display_name || node.tag_number}
+        </Link>
+      </span>
+      {(node.dam || node.sire) && (
+        <div className="mt-1 space-y-1">
+          <PedigreeNode node={node.dam} role="Dam" />
+          <PedigreeNode node={node.sire} role="Sire" />
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AnimalDetailPage() {
   const { id } = useParams()
 
@@ -28,6 +61,12 @@ export default function AnimalDetailPage() {
   const { data: milkData } = useQuery({
     queryKey: ['milk-records', id],
     queryFn: () => milkAPI.listRecords({ animal: id, page_size: 60 }).then(r => r.data),
+    enabled: !!id,
+  })
+
+  const { data: pedigree } = useQuery({
+    queryKey: ['pedigree', id],
+    queryFn: () => animalAPI.pedigree(id).then(r => r.data),
     enabled: !!id,
   })
 
@@ -76,7 +115,7 @@ export default function AnimalDetailPage() {
               ['Shed', animal.shed_detail?.name ?? '—'],
               ['Group', animal.group_detail?.name ?? '—'],
               ['Dam (Mother)', animal.dam_tag ?? '—'],
-              ['Sire Tag', animal.sire_tag || '—'],
+              ['Sire (Father)', animal.sire_display ?? '—'],
               ['Weight', animal.weight_kg ? `${animal.weight_kg} kg` : '—'],
               ['Purchase Date', animal.purchase_date ?? '—'],
               ['Purchase Price', animal.purchase_price ?? '—'],
@@ -109,6 +148,18 @@ export default function AnimalDetailPage() {
             <div className="h-48 flex items-center justify-center text-sm text-gray-400">No milk records</div>
           )}
         </div>
+      </div>
+
+      <div className="card mb-5">
+        <h3 className="font-semibold text-gray-800 mb-3 text-sm">Family Tree</h3>
+        {pedigree ? (
+          <div className="space-y-1">
+            <PedigreeNode node={pedigree.dam} role="Dam" />
+            <PedigreeNode node={pedigree.sire} role="Sire" />
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400 py-2">No pedigree data.</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

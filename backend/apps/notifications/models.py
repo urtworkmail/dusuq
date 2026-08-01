@@ -4,6 +4,8 @@ from django.db import models
 class NotificationType(models.TextChoices):
     CALVING_DUE = "calving_due", "Calving Due"
     PREG_CHECK_DUE = "preg_check_due", "Pregnancy Check Due"
+    DRY_OFF_DUE = "dry_off_due", "Dry-off Due"
+    CLOSE_UP_DUE = "close_up_due", "Close-up Period Starting"
     VACCINATION_DUE = "vaccination_due", "Vaccination Due"
     DEWORMING_DUE = "deworming_due", "Deworming Due"
     TREATMENT_FOLLOWUP = "treatment_followup", "Treatment Follow-up Due"

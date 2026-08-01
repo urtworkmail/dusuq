@@ -60,6 +60,12 @@ function FarmProfileTab() {
           <FormField label="City">
             <input {...register('city')} className="form-input" />
           </FormField>
+          <FormField label="District">
+            <input {...register('district')} className="form-input" />
+          </FormField>
+          <FormField label="Province">
+            <input {...register('province')} className="form-input" />
+          </FormField>
           <FormField label="Country">
             <input {...register('country')} className="form-input" />
           </FormField>

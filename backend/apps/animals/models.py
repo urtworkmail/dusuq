@@ -55,8 +55,20 @@ class Animal(models.Model):
         related_name="calves",
         verbose_name="Dam (Mother)",
     )
+    sire = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="sired_calves",
+        verbose_name="Sire (Father)",
+        help_text="Only set when the sire is itself a registered animal in this farm's records.",
+    )
     sire_tag = models.CharField(
-        max_length=50, blank=True, verbose_name="Sire Tag / Bull ID"
+        max_length=50,
+        blank=True,
+        verbose_name="Sire Tag / Bull ID",
+        help_text="Free-text identifier for an unregistered/outside sire (e.g. purchased AI semen) — used when `sire` isn't linked to a real record.",
     )
     lactation_number = models.PositiveSmallIntegerField(default=0)
     purchase_date = models.DateField(null=True, blank=True)

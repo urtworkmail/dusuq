@@ -84,3 +84,46 @@ class Consumption(models.Model):
 
     class Meta:
         ordering = ["-date"]
+
+
+class FeedRation(models.Model):
+    """
+    A planned daily ration: how much of a feed product each animal in a shed
+    or group should get per day. This is the *plan*; `Consumption` records
+    what was actually used — the ration lets a farm compare planned vs.
+    actual, and estimate how many days of stock remain for a given ration.
+    """
+    tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE, related_name="feed_rations")
+    name = models.CharField(max_length=150)
+    shed = models.ForeignKey(
+        "tenants.Shed", on_delete=models.SET_NULL, null=True, blank=True, related_name="feed_rations"
+    )
+    group = models.ForeignKey(
+        "tenants.AnimalGroup", on_delete=models.SET_NULL, null=True, blank=True, related_name="feed_rations"
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="feed_rations")
+    quantity_per_animal_per_day = models.DecimalField(
+        max_digits=8, decimal_places=3, validators=[MinValueValidator(0)]
+    )
+    is_active = models.BooleanField(default=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        target = self.shed.name if self.shed else (self.group.name if self.group else "All animals")
+        return f"{self.name} — {self.product.name} for {target}"
+
+    def animal_count(self):
+        from apps.animals.models import Animal
+        qs = Animal.objects.filter(tenant=self.tenant, is_active=True)
+        if self.shed_id:
+            qs = qs.filter(shed_id=self.shed_id)
+        elif self.group_id:
+            qs = qs.filter(group_id=self.group_id)
+        return qs.count()
+
+    def planned_daily_quantity(self):
+        return float(self.quantity_per_animal_per_day) * self.animal_count()

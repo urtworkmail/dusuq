@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { reportsAPI } from '@/api/endpoints'
-import { DataTable, DateRangeFilter, FormField } from '@/components/ui'
+import { DataTable, DateRangeFilter, FormField, StatCard, PageSpinner } from '@/components/ui'
 import { useQuery } from '@tanstack/react-query'
-import { Download, BarChart2 } from 'lucide-react'
+import { Download, BarChart2, TrendingUp, TrendingDown, Minus, Baby, Milk } from 'lucide-react'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
 
@@ -165,12 +165,55 @@ const REPORTS = [
   },
 ]
 
+const TREND_ICON = { up: TrendingUp, down: TrendingDown, flat: Minus }
+
+function ForecastSection() {
+  const { data: forecast, isLoading: fLoading } = useQuery({ queryKey: ['forecast'], queryFn: () => reportsAPI.forecast({ horizon_days: 30 }).then(r => r.data) })
+  const { data: herd, isLoading: hLoading } = useQuery({ queryKey: ['herd-growth'], queryFn: () => reportsAPI.herdGrowth().then(r => r.data) })
+  if (fLoading || hLoading) return <PageSpinner />
+  const TrendIcon = TREND_ICON[forecast?.milk_trend?.trend_direction ?? 'flat']
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-gray-400">
+        Calculated directly from your farm's recorded data (not AI-generated) — expected calvings and
+        dry-offs are counted from real upcoming due dates, milk trend is a linear projection from the
+        last 90 days, and the herd projection is based on your trailing 12-month calving/loss rate.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard label={`Expected Calvings (next ${forecast?.horizon_days}d)`} value={forecast?.expected_calvings?.count ?? 0} icon={Baby} color="bg-pink-50" iconColor="text-pink-600" />
+        <StatCard label={`Expected Dry-offs (next ${forecast?.horizon_days}d)`} value={forecast?.expected_dry_offs?.count ?? 0} icon={Baby} color="bg-amber-50" iconColor="text-amber-600" />
+        <StatCard
+          label="Milk Trend"
+          value={`${forecast?.milk_trend?.current_daily_avg_litres ?? 0}L → ${forecast?.milk_trend?.projected_daily_avg_litres ?? 0}L/day`}
+          icon={TrendIcon}
+          color={forecast?.milk_trend?.trend_direction === 'up' ? 'bg-green-50' : forecast?.milk_trend?.trend_direction === 'down' ? 'bg-red-50' : 'bg-gray-50'}
+          iconColor={forecast?.milk_trend?.trend_direction === 'up' ? 'text-green-600' : forecast?.milk_trend?.trend_direction === 'down' ? 'text-red-600' : 'text-gray-500'}
+        />
+      </div>
+      <div className="card">
+        <h3 className="font-semibold text-gray-800 mb-3 text-sm">Herd Growth Projection</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
+          <StatCard label="Current Herd Size" value={herd?.current_herd_size ?? 0} icon={Milk} />
+          <StatCard label="+12 Months" value={herd?.projections?.plus_12_months ?? '—'} />
+          <StatCard label="+24 Months" value={herd?.projections?.plus_24_months ?? '—'} />
+          <StatCard label="+36 Months" value={herd?.projections?.plus_36_months ?? '—'} />
+        </div>
+        <p className="text-xs text-gray-400">{herd?.note}</p>
+      </div>
+    </div>
+  )
+}
+
 export default function ReportsPage() {
   return (
     <div>
       <div className="page-header">
         <h1 className="page-title">Reports Hub</h1>
         <p className="text-sm text-gray-500">Run any report and export to Excel</p>
+      </div>
+      <div className="mb-8">
+        <h2 className="text-base font-semibold text-gray-700 mb-3">📈 Forecast &amp; Projections</h2>
+        <ForecastSection />
       </div>
       <div className="space-y-8">
         {REPORTS.map(group => (

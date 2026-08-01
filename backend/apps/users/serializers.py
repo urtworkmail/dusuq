@@ -8,6 +8,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from apps.tenants.models import Tenant
 from apps.subscriptions.models import Subscription, SubscriptionStatus
+from apps.platform_admin.audit import log_signup, log_login
 from .models import Role
 
 User = get_user_model()
@@ -19,6 +20,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
+        log_login(user, self.context.get("request"))
         data["user"] = {
             "id": str(user.id),
             "email": user.email,
@@ -27,6 +29,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             "role": user.role,
             "tenant_id": str(user.tenant_id) if user.tenant_id else None,
             "tenant_name": user.tenant.name if user.tenant else None,
+            "is_superuser": user.is_superuser,
         }
         subscription = getattr(user.tenant, "subscription", None) if user.tenant else None
         data["subscription"] = (
@@ -96,6 +99,7 @@ class RegisterSerializer(serializers.Serializer):
             status=SubscriptionStatus.TRIALING,
             trial_end=timezone.now() + timedelta(days=settings.TRIAL_PERIOD_DAYS),
         )
+        log_signup(user, tenant, self.context.get("request"))
         return user, tenant
 
 
@@ -106,7 +110,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "id", "email", "first_name", "last_name", "full_name",
-            "phone", "role", "avatar", "is_active", "date_joined", "last_login",
+            "phone", "role", "avatar", "is_active", "is_superuser", "date_joined", "last_login",
         ]
         read_only_fields = ["id", "date_joined", "last_login"]
 

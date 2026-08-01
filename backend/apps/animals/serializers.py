@@ -32,6 +32,7 @@ class AnimalDetailSerializer(serializers.ModelSerializer):
     shed_detail = ShedSerializer(source="shed", read_only=True)
     group_detail = AnimalGroupSerializer(source="group", read_only=True)
     dam_tag = serializers.CharField(source="dam.tag_number", read_only=True)
+    sire_display = serializers.SerializerMethodField()
     age_months = serializers.SerializerMethodField()
     is_milking = serializers.BooleanField(read_only=True)
 
@@ -39,6 +40,11 @@ class AnimalDetailSerializer(serializers.ModelSerializer):
         model = Animal
         exclude = ["tenant"]
         read_only_fields = ["created_at", "updated_at"]
+
+    def get_sire_display(self, obj):
+        if obj.sire_id:
+            return obj.sire.tag_number
+        return obj.sire_tag or None
 
     def get_age_months(self, obj):
         if not obj.date_of_birth:
@@ -61,3 +67,18 @@ class AnimalCreateSerializer(serializers.ModelSerializer):
         if qs.exists():
             raise serializers.ValidationError("Tag number already exists in this farm.")
         return value
+
+    def _validate_same_tenant(self, value, field_name):
+        # Animal uses sequential integer PKs (not UUIDs), so a cross-tenant
+        # animal ID is trivially guessable/enumerable — without this check a
+        # tenant could link dam/sire to another tenant's animal and have it
+        # surface via dam_tag/sire_display or the /pedigree/ endpoint.
+        if value is not None and value.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError(f"{field_name} does not belong to this farm.")
+        return value
+
+    def validate_dam(self, value):
+        return self._validate_same_tenant(value, "Dam")
+
+    def validate_sire(self, value):
+        return self._validate_same_tenant(value, "Sire")

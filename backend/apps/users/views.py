@@ -15,6 +15,7 @@ from .serializers import (
     ResetPasswordSerializer,
 )
 from .permissions import IsTenantOwner, IsSameTenant
+from apps.platform_admin.audit import log_logout
 
 User = get_user_model()
 
@@ -49,7 +50,7 @@ class RegisterView(APIView):
     throttle_classes = [RegisterThrottle]
 
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
+        serializer = RegisterSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user, tenant = serializer.save()
 
@@ -68,6 +69,7 @@ class RegisterView(APIView):
                     "role": user.role,
                     "tenant_id": str(tenant.id),
                     "tenant_name": tenant.name,
+                    "is_superuser": user.is_superuser,
                 },
                 "subscription": (
                     {
@@ -92,6 +94,8 @@ class LogoutView(APIView):
             refresh_token = request.data.get("refresh")
             token = RefreshToken(refresh_token)
             token.blacklist()
+            if request.user and request.user.is_authenticated:
+                log_logout(request.user, request)
             return Response({"detail": "Logged out."})
         except Exception:
             return Response({"detail": "Invalid token."}, status=400)

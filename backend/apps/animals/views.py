@@ -69,6 +69,51 @@ class AnimalDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Response({"detail": "Animal deactivated."})
 
 
+def _pedigree_node(animal, generations_remaining, tenant_id):
+    if animal is None:
+        return None
+    # Defense-in-depth: AnimalCreateSerializer now rejects a dam/sire from
+    # another tenant at write time, but this check keeps the read path safe
+    # regardless of how a cross-tenant link could exist (pre-existing data,
+    # direct Django admin edits, a future bug) — Animal uses sequential
+    # integer PKs, not UUIDs, so a stray cross-tenant FK is a real IDOR risk,
+    # not just a theoretical one.
+    if animal.tenant_id != tenant_id:
+        return None
+    node = {
+        "id": animal.id,
+        "tag_number": animal.tag_number,
+        "display_name": animal.display_name,
+        "sex": animal.sex,
+    }
+    if generations_remaining > 0:
+        node["dam"] = _pedigree_node(animal.dam, generations_remaining - 1, tenant_id)
+        if animal.sire_id:
+            node["sire"] = _pedigree_node(animal.sire, generations_remaining - 1, tenant_id)
+        elif animal.sire_tag:
+            node["sire"] = {"tag_number": animal.sire_tag, "unregistered": True}
+        else:
+            node["sire"] = None
+    return node
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def animal_pedigree(request, pk):
+    """
+    Multi-generation family tree: parents, grandparents, and
+    great-grandparents, wherever those ancestors are themselves recorded as
+    animals in this farm. A sire that was never registered (e.g. purchased AI
+    semen from an outside bull) shows only as a free-text tag.
+    """
+    try:
+        animal = Animal.objects.get(id=pk, tenant=request.tenant)
+    except Animal.DoesNotExist:
+        return Response({"detail": "Animal not found."}, status=404)
+
+    return Response(_pedigree_node(animal, generations_remaining=3, tenant_id=request.tenant.id))
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def animal_summary(request):

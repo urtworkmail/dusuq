@@ -21,4 +21,8 @@ urlpatterns = [
     # Inventory
     path("stock/", views.report_stock_summary, name="report-stock"),
     path("consumption/", views.report_consumption, name="report-consumption"),
+
+    # Forecasting (deterministic, not AI)
+    path("forecast/", views.forecast_summary, name="forecast-summary"),
+    path("herd-growth-projection/", views.herd_growth_projection, name="herd-growth-projection"),
 ]

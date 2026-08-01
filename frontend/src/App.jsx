@@ -17,18 +17,35 @@ import AccountsPage from '@/pages/accounts/AccountsPage'
 import InventoryPage from '@/pages/inventory/InventoryPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import VetAssistPage from '@/pages/vetassist/VetAssistPage'
+import PayrollPage from '@/pages/payroll/PayrollPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
 import SupportPage from '@/pages/support/SupportPage'
+import PlatformAdminPage from '@/pages/platform-admin/PlatformAdminPage'
 
 function RequireAuth({ children }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
+  // Platform admin accounts have no farm/tenant, so the regular tenant-scoped
+  // app shell has nothing to show them (and its API calls would 403 — see
+  // TenantMiddleware, which requires a tenant for any non-exempt path).
+  if (user.is_superuser) return <Navigate to="/platform-admin" replace />
   return children
 }
 
 function RequireGuest({ children }) {
   const { user } = useAuth()
-  if (user) return <Navigate to="/" replace />
+  // Platform admin accounts have no farm/tenant — send them straight to
+  // their own dashboard instead of the regular tenant-scoped app root.
+  if (user) return <Navigate to={user.is_superuser ? '/platform-admin' : '/'} replace />
+  return children
+}
+
+function RequirePlatformAdmin({ children }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  // Client-side check is UX only — every platform-admin API call enforces
+  // IsPlatformAdmin (is_superuser) server-side regardless of this.
+  if (!user.is_superuser) return <Navigate to="/" replace />
   return children
 }
 
@@ -51,9 +68,13 @@ export default function App() {
         <Route path="inventory/*" element={<InventoryPage />} />
         <Route path="reports/*" element={<ReportsPage />} />
         <Route path="vetassist/*" element={<VetAssistPage />} />
+        <Route path="payroll/*" element={<PayrollPage />} />
         <Route path="settings/*" element={<SettingsPage />} />
         <Route path="support" element={<SupportPage />} />
       </Route>
+
+      {/* Platform admin — separate shell, no tenant context, superuser-only */}
+      <Route path="/platform-admin/*" element={<RequirePlatformAdmin><PlatformAdminPage /></RequirePlatformAdmin>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

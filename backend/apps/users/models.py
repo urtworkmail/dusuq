@@ -52,6 +52,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(null=True, blank=True)
+    last_activity = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Updated (throttled, at most once/minute) by UpdateLastActivityMiddleware on any "
+                   "authenticated request — used to compute 'currently online' for the platform admin dashboard.",
+    )
 
     objects = UserManager()
 

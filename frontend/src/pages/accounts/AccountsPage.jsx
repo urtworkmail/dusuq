@@ -17,6 +17,7 @@ const TABS = [
   { to: '/accounts/pnl', label: 'P&L Report' },
   { to: '/accounts/ledger', label: 'Ledger' },
   { to: '/accounts/trial-balance', label: 'Trial Balance' },
+  { to: '/accounts/balance-sheet', label: 'Balance Sheet' },
 ]
 
 function TabBar() {
@@ -43,6 +44,11 @@ function AccountsDashboard() {
         <StatCard label="Expense (FY)"  value={data?.expense_fy != null ? `PKR ${Number(data.expense_fy).toLocaleString()}` : '—'}  icon={TrendingDown} color="bg-red-50"    iconColor="text-red-600" />
         <StatCard label="Net Profit (FY)" value={data?.profit_fy != null ? `PKR ${Number(data.profit_fy).toLocaleString()}` : '—'} icon={DollarSign}   color={data?.profit_fy >= 0 ? 'bg-blue-50' : 'bg-red-50'} iconColor={data?.profit_fy >= 0 ? 'text-blue-600' : 'text-red-600'} />
         <StatCard label="Total Asset Value" value={data?.total_asset_value != null ? `PKR ${Number(data.total_asset_value).toLocaleString()}` : '—'} icon={Package} color="bg-purple-50" iconColor="text-purple-600" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard label="Milk Produced (FY)" value={data?.milk_litres_fy != null ? `${Number(data.milk_litres_fy).toLocaleString()} L` : '—'} icon={Package} color="bg-gray-50" iconColor="text-gray-600" />
+        <StatCard label="Revenue / Litre (FY)" value={data?.milk_revenue_per_litre_fy != null ? `PKR ${data.milk_revenue_per_litre_fy}` : '—'} icon={TrendingUp} color="bg-green-50" iconColor="text-green-600" />
+        <StatCard label="Profit / Litre (FY)" value={data?.profit_per_litre_fy != null ? `PKR ${data.profit_per_litre_fy}` : '—'} icon={DollarSign} color={data?.profit_per_litre_fy >= 0 ? 'bg-blue-50' : 'bg-red-50'} iconColor={data?.profit_per_litre_fy >= 0 ? 'text-blue-600' : 'text-red-600'} />
       </div>
       <div className="card">
         <h3 className="font-semibold text-gray-800 mb-3 text-sm">Monthly P&L (Last 6 Months)</h3>
@@ -376,6 +382,68 @@ function TrialBalanceTab() {
   )
 }
 
+function BalanceSheetTab() {
+  const today = format(new Date(), 'yyyy-MM-dd')
+  const [asOf, setAsOf] = useState(today)
+  const { data, isLoading } = useQuery({ queryKey: ['balance-sheet', asOf], queryFn: () => accountsAPI.balanceSheet({ as_of: asOf }).then(r => r.data) })
+  if (isLoading) return <PageSpinner />
+  const balanced = Math.abs(data?.difference ?? 0) < 0.01
+  return (
+    <div className="space-y-4">
+      <div className="card flex items-end justify-between gap-3">
+        <FormField label="As of Date">
+          <input type="date" value={asOf} onChange={e => setAsOf(e.target.value)} className="form-input w-40" />
+        </FormField>
+        <span className={`badge ${balanced ? 'badge-green' : 'badge-red'}`}>
+          {balanced ? 'Balanced' : `Out of balance by PKR ${Number(data?.difference ?? 0).toLocaleString()}`}
+        </span>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="card">
+          <h3 className="font-semibold text-gray-800 mb-3 text-sm">Assets</h3>
+          <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Current Assets</div>
+          {(data?.current_assets ?? []).map((r, i) => (
+            <div key={i} className="flex justify-between text-sm py-1.5 border-b border-gray-50">
+              <span>{r.account}</span><span className="font-medium">PKR {Number(r.balance).toLocaleString()}</span>
+            </div>
+          ))}
+          <div className="text-xs font-semibold text-gray-500 uppercase mt-3 mb-1">Fixed Assets</div>
+          {(data?.fixed_assets ?? []).map((r, i) => (
+            <div key={i} className="flex justify-between text-sm py-1.5 border-b border-gray-50">
+              <span>{r.asset} <span className="text-gray-400 capitalize">({r.category})</span></span>
+              <span className="font-medium">PKR {Number(r.current_value).toLocaleString()}</span>
+            </div>
+          ))}
+          <div className="flex justify-between text-sm pt-3 mt-2 border-t border-gray-200 font-bold">
+            <span>Total Assets</span><span>PKR {Number(data?.total_assets ?? 0).toLocaleString()}</span>
+          </div>
+        </div>
+        <div className="card">
+          <h3 className="font-semibold text-gray-800 mb-3 text-sm">Liabilities &amp; Equity</h3>
+          <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Liabilities</div>
+          {(data?.liabilities ?? []).map((r, i) => (
+            <div key={i} className="flex justify-between text-sm py-1.5 border-b border-gray-50">
+              <span>{r.account}</span><span className="font-medium text-red-600">PKR {Number(r.balance).toLocaleString()}</span>
+            </div>
+          ))}
+          <div className="text-xs font-semibold text-gray-500 uppercase mt-3 mb-1">Equity</div>
+          {(data?.equity ?? []).map((r, i) => (
+            <div key={i} className="flex justify-between text-sm py-1.5 border-b border-gray-50">
+              <span>{r.account}</span><span className="font-medium">PKR {Number(r.balance).toLocaleString()}</span>
+            </div>
+          ))}
+          <div className="flex justify-between text-sm py-1.5 border-b border-gray-50">
+            <span>Retained Earnings</span><span className="font-medium">PKR {Number(data?.retained_earnings ?? 0).toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-sm pt-3 mt-2 border-t border-gray-200 font-bold">
+            <span>Total Liabilities &amp; Equity</span><span>PKR {Number(data?.total_liabilities_and_equity ?? 0).toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AccountsPage() {
   return (
     <div>
@@ -389,6 +457,7 @@ export default function AccountsPage() {
         <Route path="pnl" element={<PnLTab />} />
         <Route path="ledger" element={<LedgerTab />} />
         <Route path="trial-balance" element={<TrialBalanceTab />} />
+        <Route path="balance-sheet" element={<BalanceSheetTab />} />
       </Routes>
     </div>
   )

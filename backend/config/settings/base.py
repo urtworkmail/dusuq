@@ -61,6 +61,8 @@ LOCAL_APPS = [
     "apps.tickets",
     "apps.vetassist",
     "apps.subscriptions",
+    "apps.payroll",
+    "apps.platform_admin",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -76,6 +78,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.tenants.middleware.TenantMiddleware",
+    "apps.platform_admin.middleware.UpdateLastActivityMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"

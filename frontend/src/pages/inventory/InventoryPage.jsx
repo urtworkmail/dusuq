@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Routes, Route, NavLink } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { inventoryAPI } from '@/api/endpoints'
+import { inventoryAPI, tenantAPI } from '@/api/endpoints'
 import { DataTable, Pagination, Modal, DateRangeFilter, PageSpinner, FormField, Spinner, StatCard } from '@/components/ui'
 import { Plus, Package, AlertTriangle } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -14,6 +14,7 @@ const TABS = [
   { to: '/inventory/products', label: 'Products' },
   { to: '/inventory/stock-in', label: 'Stock In' },
   { to: '/inventory/consumption', label: 'Consumption' },
+  { to: '/inventory/feed-rations', label: 'Feed Rations' },
 ]
 
 function TabBar() {
@@ -233,6 +234,92 @@ function ConsumptionTab() {
   )
 }
 
+function FeedRationsTab() {
+  const qc = useQueryClient()
+  const [modal, setModal] = useState(false)
+  const { data, isLoading } = useQuery({ queryKey: ['feed-rations'], queryFn: () => inventoryAPI.listFeedRations().then(r => r.data) })
+  const { data: summary } = useQuery({ queryKey: ['feed-plan-summary'], queryFn: () => inventoryAPI.feedPlanSummary().then(r => r.data) })
+  const { data: products } = useQuery({ queryKey: ['products'], queryFn: () => inventoryAPI.listProducts().then(r => r.data) })
+  const { data: sheds } = useQuery({ queryKey: ['sheds'], queryFn: () => tenantAPI.listSheds().then(r => r.data) })
+  const { data: groups } = useQuery({ queryKey: ['groups'], queryFn: () => tenantAPI.listGroups().then(r => r.data) })
+  const { register, handleSubmit, reset } = useForm({ defaultValues: { is_active: true } })
+  const mut = useMutation({
+    mutationFn: inventoryAPI.createFeedRation,
+    onSuccess: () => { toast.success('Ration saved'); qc.invalidateQueries(['feed-rations']); qc.invalidateQueries(['feed-plan-summary']); reset(); setModal(false) },
+    onError: (e) => toast.error(Object.values(e.response?.data ?? {}).flat()[0] ?? 'Error'),
+  })
+  const rations = Array.isArray(data) ? data : (data?.results ?? [])
+  const productList = Array.isArray(products) ? products : (products?.results ?? [])
+  const shedList = Array.isArray(sheds) ? sheds : (sheds?.results ?? [])
+  const groupList = Array.isArray(groups) ? groups : (groups?.results ?? [])
+  const cols = [
+    { key: 'name', label: 'Ration Name' },
+    { key: 'product_name', label: 'Product' },
+    { key: 'quantity_per_animal_per_day', label: 'Qty/Animal/Day', render: (v, row) => `${v} ${row.product_unit}` },
+    { key: 'animal_count', label: 'Animals Covered' },
+    { key: 'planned_daily_quantity', label: 'Total/Day', render: (v, row) => `${v} ${row.product_unit}` },
+    { key: 'is_active', label: 'Status', render: v => <span className={`badge ${v ? 'badge-green' : 'badge-gray'}`}>{v ? 'Active' : 'Inactive'}</span> },
+  ]
+  return (
+    <div className="space-y-5">
+      {summary?.results?.length > 0 && (
+        <div className="card p-0">
+          <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-800 text-sm">Days of Stock Remaining at Planned Rate</div>
+          <div className="overflow-x-auto">
+            <table className="table">
+              <thead><tr><th>Ration</th><th>Product</th><th>Target</th><th>Planned/Day</th><th>Current Stock</th><th>Days Remaining</th></tr></thead>
+              <tbody className="bg-white divide-y divide-gray-50">
+                {summary.results.map(r => (
+                  <tr key={r.id} className={r.days_remaining != null && r.days_remaining <= 7 ? 'bg-red-50/30' : ''}>
+                    <td className="font-medium">{r.name}</td>
+                    <td>{r.product}</td>
+                    <td>{r.target} ({r.animal_count})</td>
+                    <td>{r.planned_daily_quantity} {r.unit}</td>
+                    <td>{r.current_stock} {r.unit}</td>
+                    <td className={`font-semibold ${r.days_remaining != null && r.days_remaining <= 7 ? 'text-red-600' : 'text-gray-800'}`}>{r.days_remaining ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-end">
+        <button className="btn btn-primary" onClick={() => setModal(true)}><Plus size={16} />Add Ration Plan</button>
+      </div>
+      <div className="card p-0"><DataTable columns={cols} data={rations} loading={isLoading} /></div>
+      <Modal open={modal} onClose={() => { setModal(false); reset() }} title="Add Feed Ration Plan" size="lg">
+        <form onSubmit={handleSubmit(mut.mutate)} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField label="Ration Name" required><input {...register('name', { required: true })} className="form-input" placeholder="e.g. Milking Herd Silage" /></FormField>
+            <FormField label="Product" required>
+              <select {...register('product', { required: true })} className="form-select">
+                <option value="">— Select product —</option>
+                {productList.map(p => <option key={p.id} value={p.id}>{p.name} ({p.unit})</option>)}
+              </select>
+            </FormField>
+            <FormField label="Shed (optional)">
+              <select {...register('shed')} className="form-select">
+                <option value="">— Not shed-specific —</option>
+                {shedList.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </FormField>
+            <FormField label="Group (optional)">
+              <select {...register('group')} className="form-select">
+                <option value="">— Not group-specific —</option>
+                {groupList.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+              </select>
+            </FormField>
+            <FormField label="Quantity per Animal per Day" required><input type="number" step="0.001" {...register('quantity_per_animal_per_day', { required: true })} className="form-input" /></FormField>
+          </div>
+          <FormField label="Notes"><textarea {...register('notes')} rows={2} className="form-input" /></FormField>
+          <div className="flex justify-end"><button type="submit" disabled={mut.isPending} className="btn btn-primary">{mut.isPending ? <Spinner size={16} className="text-white" /> : 'Save Ration'}</button></div>
+        </form>
+      </Modal>
+    </div>
+  )
+}
+
 export default function InventoryPage() {
   return (
     <div>
@@ -243,6 +330,7 @@ export default function InventoryPage() {
         <Route path="products" element={<ProductsTab />} />
         <Route path="stock-in" element={<StockInTab />} />
         <Route path="consumption" element={<ConsumptionTab />} />
+        <Route path="feed-rations" element={<FeedRationsTab />} />
       </Routes>
     </div>
   )

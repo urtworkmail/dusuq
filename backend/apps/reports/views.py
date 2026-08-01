@@ -3,7 +3,7 @@ Reports engine — generates Excel and PDF exports for all modules.
 All report endpoints accept date_from / date_to query params.
 """
 import io
-from datetime import date
+from datetime import date, timedelta
 from django.http import HttpResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -515,3 +515,143 @@ def report_consumption(request):
         }
         for r in rows
     ]})
+
+
+# ─── Forecasting (deterministic — calculated from real data, not AI) ─────────
+
+def _linear_trend(points):
+    """
+    Least-squares slope/intercept for [(x, y), ...] using pure Python (no
+    numpy dependency). Returns (slope, intercept); (0, mean_y) if fewer than
+    2 distinct x values, since a trend line is meaningless with less data.
+    """
+    n = len(points)
+    if n < 2:
+        return 0.0, (points[0][1] if points else 0.0)
+    sum_x = sum(p[0] for p in points)
+    sum_y = sum(p[1] for p in points)
+    mean_x = sum_x / n
+    mean_y = sum_y / n
+    num = sum((p[0] - mean_x) * (p[1] - mean_y) for p in points)
+    den = sum((p[0] - mean_x) ** 2 for p in points)
+    if den == 0:
+        return 0.0, mean_y
+    slope = num / den
+    intercept = mean_y - slope * mean_x
+    return slope, intercept
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def forecast_summary(request):
+    """
+    Real, calculated forecasts — not AI-generated text. Counts actual
+    upcoming due dates from reproduction records, and projects milk trend via
+    linear regression over the trailing 90 days of daily totals.
+    """
+    from django.db.models import Sum
+    from apps.reproduction.models import Insemination
+    from apps.milk.models import MilkRecord
+
+    tenant = request.tenant
+    today = date.today()
+    horizon_days = int(request.query_params.get("horizon_days", 30))
+    horizon = today + timedelta(days=horizon_days)
+
+    pregnant_inseminations = list(
+        Insemination.objects.filter(tenant=tenant, animal__status="pregnant").select_related("animal")
+    )
+
+    expected_calvings = []
+    expected_dry_offs = []
+    for ins in pregnant_inseminations:
+        ecd = ins.expected_calving_date
+        if today <= ecd <= horizon:
+            expected_calvings.append({"animal_tag": ins.animal.tag_number, "expected_date": str(ecd)})
+        dry_off_date = ecd - timedelta(days=60)
+        if today <= dry_off_date <= horizon:
+            expected_dry_offs.append({"animal_tag": ins.animal.tag_number, "expected_date": str(dry_off_date)})
+
+    # Milk trend — daily totals over the trailing 90 days, linear regression
+    # projected forward to the end of the horizon.
+    trend_start = today - timedelta(days=90)
+    daily_totals = list(
+        MilkRecord.objects.filter(tenant=tenant, date__gte=trend_start, date__lte=today)
+        .values("date").annotate(total=Sum("litres")).order_by("date")
+    )
+    points = [((row["date"] - trend_start).days, float(row["total"])) for row in daily_totals]
+    slope, intercept = _linear_trend(points)
+
+    current_daily_avg = round(sum(p[1] for p in points) / len(points), 1) if points else 0.0
+    projected_x = (horizon - trend_start).days
+    projected_daily = round(slope * projected_x + intercept, 1) if points else 0.0
+
+    return Response({
+        "horizon_days": horizon_days,
+        "expected_calvings": {
+            "count": len(expected_calvings),
+            "animals": expected_calvings,
+        },
+        "expected_dry_offs": {
+            "count": len(expected_dry_offs),
+            "animals": expected_dry_offs,
+        },
+        "milk_trend": {
+            "current_daily_avg_litres": current_daily_avg,
+            "projected_daily_avg_litres": max(projected_daily, 0.0),
+            "trend_direction": "up" if slope > 0.05 else ("down" if slope < -0.05 else "flat"),
+            "based_on_days": len(points),
+        },
+    })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def herd_growth_projection(request):
+    """
+    Simple, transparent herd-size projection: current headcount plus the
+    trailing-12-month net growth rate (calvings minus deaths/sold/culled),
+    extrapolated linearly to +12/+24/+36 months. Deliberately not a
+    compounding/demographic model — easy to explain and sanity-check, which
+    matters more here than modeling precision for a first version.
+    """
+    from apps.animals.models import Animal, AnimalStatus
+    from apps.reproduction.models import Calving
+
+    tenant = request.tenant
+    today = date.today()
+    year_ago = today - timedelta(days=365)
+
+    current_herd_size = Animal.objects.filter(tenant=tenant, is_active=True).count()
+
+    calvings_last_year = Calving.objects.filter(
+        tenant=tenant, calving_date__gte=year_ago, calving_date__lte=today
+    ).exclude(calf_sex="stillborn").count()
+
+    losses_last_year = Animal.objects.filter(
+        tenant=tenant,
+        status__in=[AnimalStatus.SOLD, AnimalStatus.DEAD, AnimalStatus.CULLED],
+        updated_at__date__gte=year_ago, updated_at__date__lte=today,
+    ).count()
+
+    avg_monthly_calvings = calvings_last_year / 12
+    avg_monthly_losses = losses_last_year / 12
+    net_monthly_growth = avg_monthly_calvings - avg_monthly_losses
+
+    projections = {
+        f"plus_{months}_months": max(round(current_herd_size + net_monthly_growth * months), 0)
+        for months in (12, 24, 36)
+    }
+
+    return Response({
+        "current_herd_size": current_herd_size,
+        "avg_monthly_calvings": round(avg_monthly_calvings, 2),
+        "avg_monthly_losses": round(avg_monthly_losses, 2),
+        "net_monthly_growth": round(net_monthly_growth, 2),
+        "projections": projections,
+        "note": (
+            "Linear projection based on the trailing 12 months' calving and "
+            "loss (sold/dead/culled) rate. Does not account for seasonality, "
+            "purchases, or changes in herd management."
+        ),
+    })

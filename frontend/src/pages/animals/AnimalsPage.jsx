@@ -60,7 +60,15 @@ function AnimalForm({ defaultValues, onSubmit, loading, breeds = [], sheds = [],
             ))}
           </select>
         </FormField>
-        <FormField label="Sire Tag">
+        <FormField label="Sire (if registered in this farm)">
+          <select {...register('sire')} className="form-select">
+            <option value="">— Not registered —</option>
+            {animals.filter(a => a.sex === 'male').map(a => (
+              <option key={a.id} value={a.id}>{a.tag_number} {a.name ? `— ${a.name}` : ''}</option>
+            ))}
+          </select>
+        </FormField>
+        <FormField label="Sire Tag (if not registered)">
           <input {...register('sire_tag')} className="form-input" placeholder="Bull ID / tag" />
         </FormField>
         <FormField label="Purchase Date">
@@ -192,7 +200,7 @@ export default function AnimalsPage() {
       <Modal open={modal && modal !== 'create'} onClose={() => setModal(null)} title="Edit Animal" size="lg">
         {modal && modal !== 'create' && (
           <AnimalForm
-            defaultValues={{ ...modal, breed: modal.breed ?? '', shed: modal.shed ?? '', group: modal.group ?? '', dam: modal.dam ?? '' }}
+            defaultValues={{ ...modal, breed: modal.breed ?? '', shed: modal.shed ?? '', group: modal.group ?? '', dam: modal.dam ?? '', sire: modal.sire ?? '' }}
             onSubmit={(d) => updateMut.mutate({ id: modal.id, data: d })}
             loading={updateMut.isPending}
             breeds={breeds ?? []}
