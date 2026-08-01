@@ -8,7 +8,7 @@ import openpyxl
 
 from apps.animals.models import Animal
 from apps.milk.models import MilkRecord, MilkSession
-from ._shared import build_column_map, get_col, parse_date, parse_decimal
+from ._shared import build_column_map, get_col, parse_date, parse_decimal, read_header_row, read_rows
 
 FIELD_ALIASES = {
     "tag_number": ["tag number", "tag no", "tag", "ear tag", "animal id", "animal tag"],
@@ -22,6 +22,20 @@ FIELD_ALIASES = {
 
 REQUIRED_FIELDS = ["tag_number", "date", "session", "litres"]
 
+FIELDS = [
+    {"key": "tag_number", "label": "Tag Number", "required": True},
+    {"key": "date", "label": "Date", "required": True},
+    {"key": "session", "label": "Session (AM / Midday / PM)", "required": True},
+    {"key": "litres", "label": "Litres", "required": True},
+    {"key": "fat_percent", "label": "Fat %", "required": False},
+    {"key": "snf_percent", "label": "SNF %", "required": False},
+    {"key": "notes", "label": "Notes", "required": False},
+]
+
+
+def suggest_column_map(header_row):
+    return build_column_map(header_row, FIELD_ALIASES)
+
 SESSION_ALIASES = {
     "am": MilkSession.AM, "a.m.": MilkSession.AM, "morning": MilkSession.AM,
     "midday": MilkSession.MIDDAY, "noon": MilkSession.MIDDAY, "afternoon": MilkSession.MIDDAY,
@@ -30,19 +44,11 @@ SESSION_ALIASES = {
 VALID_SESSIONS = {c[0] for c in MilkSession.choices}
 
 
-def parse_workbook(file):
-    try:
-        wb = openpyxl.load_workbook(file, data_only=True)
-        ws = wb.active
-    except Exception as e:
-        raise ValueError(f"Couldn't read this as an Excel file: {e}")
-
-    rows = list(ws.iter_rows(values_only=True))
-    if not rows:
-        raise ValueError("The file is empty.")
-
+def parse_workbook(file, column_map=None):
+    rows = read_rows(file)
     header_row = rows[0]
-    column_map = build_column_map(header_row, FIELD_ALIASES)
+    if column_map is None:
+        column_map = suggest_column_map(header_row)
 
     missing = [f for f in REQUIRED_FIELDS if f not in column_map]
     if missing:

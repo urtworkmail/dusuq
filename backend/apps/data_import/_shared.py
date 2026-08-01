@@ -8,6 +8,8 @@ import re
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 
+import openpyxl
+
 
 def normalize_header(h):
     if h is None:
@@ -53,6 +55,24 @@ def parse_decimal(value, field_name):
         return Decimal(str(value).strip())
     except (InvalidOperation, ValueError):
         raise ValueError(f"{field_name} must be a number, got {value!r}")
+
+
+def read_rows(file):
+    """Opens the uploaded file and returns every row (values_only), header row included at index 0."""
+    try:
+        wb = openpyxl.load_workbook(file, data_only=True)
+        ws = wb.active
+    except Exception as e:
+        raise ValueError(f"Couldn't read this as an Excel file: {e}")
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        raise ValueError("The file is empty.")
+    return rows
+
+
+def read_header_row(file):
+    """Just the header row — used by the column-mapping step, which doesn't need the data rows yet."""
+    return list(read_rows(file)[0])
 
 
 def get_col(row, column_map, field):

@@ -10,7 +10,7 @@ import openpyxl
 from apps.animals.models import Animal, AnimalStatus
 from apps.reproduction.models import Insemination, InseminationType
 from apps.users.models import User
-from ._shared import build_column_map, get_col, parse_date, parse_decimal
+from ._shared import build_column_map, get_col, parse_date, parse_decimal, read_header_row, read_rows
 
 FIELD_ALIASES = {
     "tag_number": ["tag number", "tag no", "tag", "ear tag", "animal id", "animal tag"],
@@ -30,6 +30,22 @@ FIELD_ALIASES = {
 
 REQUIRED_FIELDS = ["tag_number", "date"]
 
+FIELDS = [
+    {"key": "tag_number", "label": "Tag Number", "required": True},
+    {"key": "date", "label": "Date", "required": True},
+    {"key": "insemination_type", "label": "Type (AI / Natural / Embryo)", "required": False},
+    {"key": "semen_batch", "label": "Semen / Embryo Batch", "required": False},
+    {"key": "technician_name", "label": "Technician Name", "required": False},
+    {"key": "veterinary_practitioner_number", "label": "Vet Practitioner #", "required": False},
+    {"key": "semen_source_company", "label": "Semen Source Company", "required": False},
+    {"key": "semen_supplier_company", "label": "Semen Supplier Company", "required": False},
+    {"key": "bull_breed", "label": "Bull / Sire Breed", "required": False},
+    {"key": "donor_dam_breed", "label": "Donor Dam Breed", "required": False},
+    {"key": "bull_tag", "label": "Bull Tag (natural service)", "required": False},
+    {"key": "repeat_number", "label": "Repeat #", "required": False},
+    {"key": "notes", "label": "Notes", "required": False},
+]
+
 TYPE_ALIASES = {
     "ai": InseminationType.AI, "artificial insemination": InseminationType.AI,
     "natural": InseminationType.NATURAL, "natural service": InseminationType.NATURAL, "bull": InseminationType.NATURAL,
@@ -37,19 +53,15 @@ TYPE_ALIASES = {
 }
 
 
-def parse_workbook(file):
-    try:
-        wb = openpyxl.load_workbook(file, data_only=True)
-        ws = wb.active
-    except Exception as e:
-        raise ValueError(f"Couldn't read this as an Excel file: {e}")
+def suggest_column_map(header_row):
+    return build_column_map(header_row, FIELD_ALIASES)
 
-    rows = list(ws.iter_rows(values_only=True))
-    if not rows:
-        raise ValueError("The file is empty.")
 
+def parse_workbook(file, column_map=None):
+    rows = read_rows(file)
     header_row = rows[0]
-    column_map = build_column_map(header_row, FIELD_ALIASES)
+    if column_map is None:
+        column_map = suggest_column_map(header_row)
 
     missing = [f for f in REQUIRED_FIELDS if f not in column_map]
     if missing:

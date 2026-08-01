@@ -4,7 +4,7 @@ import { importAPI } from '@/api/endpoints'
 import { DataTable, Spinner, StatCard, EmptyState } from '@/components/ui'
 import {
   UploadCloud, Download, FileSpreadsheet, CheckCircle2, AlertTriangle,
-  XCircle, RotateCcw, History, Beef, Droplets, Syringe,
+  XCircle, RotateCcw, History, Beef, Droplets, Syringe, ArrowRight, Pencil,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import clsx from 'clsx'
@@ -79,10 +79,25 @@ const IMPORT_TYPES = [
   },
 ]
 
+// Strips unmapped ("— Don't import —") entries and coerces select values
+// (always strings in the DOM) back to the integer column indices the
+// backend expects.
+function cleanMapping(mapping) {
+  const out = {}
+  for (const [field, value] of Object.entries(mapping)) {
+    if (value === '' || value === undefined || value === null) continue
+    out[field] = Number(value)
+  }
+  return out
+}
+
 function ImportTypeSection({ type, onImported }) {
   const fileInputRef = useRef(null)
   const [file, setFile] = useState(null)
-  const [stage, setStage] = useState('idle') // idle | previewing | previewed | committing | committed
+  // idle | detecting | mapping | previewing | previewed | committing | committed
+  const [stage, setStage] = useState('idle')
+  const [columnsData, setColumnsData] = useState(null) // { headers, fields }
+  const [mapping, setMapping] = useState({}) // { field_key: headerIndex | '' }
   const [preview, setPreview] = useState(null)
   const [commitResult, setCommitResult] = useState(null)
   const [error, setError] = useState('')
@@ -90,6 +105,8 @@ function ImportTypeSection({ type, onImported }) {
   function reset() {
     setFile(null)
     setStage('idle')
+    setColumnsData(null)
+    setMapping({})
     setPreview(null)
     setCommitResult(null)
     setError('')
@@ -101,15 +118,30 @@ function ImportTypeSection({ type, onImported }) {
     if (!f) return
     setFile(f)
     setCommitResult(null)
+    setPreview(null)
     setError('')
-    setStage('previewing')
+    setStage('detecting')
     try {
-      const res = await importAPI.preview(type.key, f)
+      const res = await importAPI.columns(type.key, f)
+      setColumnsData(res.data)
+      setMapping(res.data.suggested_map ?? {})
+      setStage('mapping')
+    } catch (err) {
+      setError(err.response?.data?.detail ?? 'Could not read this file.')
+      setStage('idle')
+    }
+  }
+
+  async function handleContinueToPreview() {
+    setStage('previewing')
+    setError('')
+    try {
+      const res = await importAPI.preview(type.key, file, cleanMapping(mapping))
       setPreview(res.data)
       setStage('previewed')
     } catch (err) {
       setError(err.response?.data?.detail ?? 'Could not read this file.')
-      setStage('idle')
+      setStage('mapping')
     }
   }
 
@@ -117,7 +149,7 @@ function ImportTypeSection({ type, onImported }) {
     if (!file) return
     setStage('committing')
     try {
-      const res = await importAPI.commit(type.key, file)
+      const res = await importAPI.commit(type.key, file, cleanMapping(mapping))
       setCommitResult(res.data)
       setStage('committed')
       toast.success(`Imported ${res.data.imported} record${res.data.imported === 1 ? '' : 's'}`)
@@ -136,6 +168,10 @@ function ImportTypeSection({ type, onImported }) {
       toast.error('Could not download template')
     }
   }
+
+  const missingRequired = stage === 'mapping' && columnsData
+    ? columnsData.fields.filter(f => f.required && (mapping[f.key] === '' || mapping[f.key] === undefined || mapping[f.key] === null))
+    : []
 
   const activeResult = stage === 'committed' ? commitResult : preview
   const rows = activeResult?.rows ?? []
@@ -181,9 +217,15 @@ function ImportTypeSection({ type, onImported }) {
         </label>
       )}
 
+      {stage === 'detecting' && (
+        <div className="flex items-center justify-center gap-2 py-10 text-gray-500">
+          <Spinner size={20} /> Reading columns from {file?.name}…
+        </div>
+      )}
+
       {stage === 'previewing' && (
         <div className="flex items-center justify-center gap-2 py-10 text-gray-500">
-          <Spinner size={20} /> Reading {file?.name}…
+          <Spinner size={20} /> Validating rows…
         </div>
       )}
 
@@ -194,11 +236,81 @@ function ImportTypeSection({ type, onImported }) {
         </div>
       )}
 
+      {stage === 'mapping' && columnsData && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <FileSpreadsheet size={15} />
+            <span className="font-medium">{file?.name}</span>
+            <button onClick={reset} className="ml-auto inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800">
+              <RotateCcw size={13} />Choose a different file
+            </button>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2.5 text-xs text-blue-800">
+            We matched what we could recognize automatically — check each row below and adjust any that picked the wrong column, or map anything we missed.
+          </div>
+
+          <div className="border border-gray-100 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
+                <tr>
+                  <th className="text-left px-4 py-2 font-medium">Dusuq Field</th>
+                  <th className="text-left px-4 py-2 font-medium">Your Column</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {columnsData.fields.map(f => {
+                  const isUnmapped = mapping[f.key] === '' || mapping[f.key] === undefined || mapping[f.key] === null
+                  return (
+                    <tr key={f.key} className={clsx(f.required && isUnmapped && 'bg-red-50/50')}>
+                      <td className="px-4 py-2.5">
+                        <span className="font-medium text-gray-800">{f.label}</span>
+                        {f.required && <span className="text-red-500 ml-1">*</span>}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <select
+                          value={mapping[f.key] ?? ''}
+                          onChange={e => setMapping(m => ({ ...m, [f.key]: e.target.value }))}
+                          className={clsx('form-select w-full max-w-xs', f.required && isUnmapped && 'border-red-300')}
+                        >
+                          <option value="">— Don't import —</option>
+                          {columnsData.headers.map((h, i) => (
+                            <option key={i} value={i}>{h || `(blank column ${i + 1})`}</option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            {missingRequired.length > 0 ? (
+              <p className="text-xs text-red-600">Map {missingRequired.map(f => f.label).join(', ')} to continue.</p>
+            ) : <span />}
+            <button
+              className="btn btn-primary"
+              disabled={missingRequired.length > 0}
+              onClick={handleContinueToPreview}
+            >
+              Continue to Preview<ArrowRight size={15} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {(stage === 'previewed' || stage === 'committing' || stage === 'committed') && activeResult && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <FileSpreadsheet size={15} />
             <span className="font-medium">{file?.name}</span>
+            {stage === 'previewed' && (
+              <button onClick={() => setStage('mapping')} className="inline-flex items-center gap-1 text-xs text-primary-600 hover:underline ml-2">
+                <Pencil size={12} />Edit column mapping
+              </button>
+            )}
             <button onClick={reset} className="ml-auto inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-800">
               <RotateCcw size={13} />Start over
             </button>

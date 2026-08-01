@@ -218,14 +218,24 @@ export const importAPI = {
   // browser auto-generates it WITH the required boundary parameter — the
   // axios instance's default 'application/json' header would otherwise
   // persist and silently break the upload.
-  preview: (dataType, file) => {
+  columns: (dataType, file) => {
     const fd = new FormData()
     fd.append('file', file)
+    return api.post(`/data-import/${dataType}/columns/`, fd, { headers: { 'Content-Type': undefined } })
+  },
+  // columnMap (optional) is the farm's confirmed {field: headerIndex} mapping
+  // from the column-mapping step — preview and commit must be called with
+  // the same one so a farm's confirmed choices are respected on commit too.
+  preview: (dataType, file, columnMap) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    if (columnMap) fd.append('column_map', JSON.stringify(columnMap))
     return api.post(`/data-import/${dataType}/preview/`, fd, { headers: { 'Content-Type': undefined } })
   },
-  commit: (dataType, file) => {
+  commit: (dataType, file, columnMap) => {
     const fd = new FormData()
     fd.append('file', file)
+    if (columnMap) fd.append('column_map', JSON.stringify(columnMap))
     return api.post(`/data-import/${dataType}/commit/`, fd, { headers: { 'Content-Type': undefined } })
   },
 }

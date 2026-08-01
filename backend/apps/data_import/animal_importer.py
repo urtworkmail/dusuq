@@ -39,6 +39,25 @@ FIELD_ALIASES = {
 
 REQUIRED_FIELDS = ["tag_number"]
 
+# Drives the column-mapping UI: one row per importable field, in display
+# order. Kept separate from FIELD_ALIASES (which only feeds the auto-match
+# heuristic) since a field's UI label doesn't need to be one of its aliases.
+FIELDS = [
+    {"key": "tag_number", "label": "Tag Number", "required": True},
+    {"key": "name", "label": "Name", "required": False},
+    {"key": "breed", "label": "Breed", "required": False},
+    {"key": "sex", "label": "Sex", "required": False},
+    {"key": "date_of_birth", "label": "Date of Birth", "required": False},
+    {"key": "status", "label": "Status", "required": False},
+    {"key": "weight_kg", "label": "Weight (kg)", "required": False},
+    {"key": "lactation_number", "label": "Lactation Number", "required": False},
+    {"key": "dam_tag", "label": "Dam Tag", "required": False},
+    {"key": "sire_tag", "label": "Sire Tag", "required": False},
+    {"key": "purchase_date", "label": "Purchase Date", "required": False},
+    {"key": "purchase_price", "label": "Purchase Price", "required": False},
+    {"key": "notes", "label": "Notes", "required": False},
+]
+
 VALID_STATUSES = {c[0] for c in AnimalStatus.choices}
 VALID_SEXES = {c[0] for c in Sex.choices}
 
@@ -65,6 +84,24 @@ def build_column_map(header_row):
     return column_map
 
 
+# Alias so views.py can call every importer module the same way regardless
+# of how each one's alias-matching is implemented internally.
+suggest_column_map = build_column_map
+
+
+def read_header_row(file):
+    """Just the header row — used by the column-mapping step before a full parse."""
+    try:
+        wb = openpyxl.load_workbook(file, data_only=True)
+        ws = wb.active
+    except Exception as e:
+        raise ValueError(f"Couldn't read this as an Excel file: {e}")
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        raise ValueError("The file is empty.")
+    return list(rows[0])
+
+
 def _parse_date(value):
     if value is None or value == "":
         return None
@@ -89,8 +126,14 @@ def _parse_decimal(value, field_name):
         raise ValueError(f"{field_name} must be a number, got {value!r}")
 
 
-def parse_workbook(file):
-    """Returns (column_map, data_rows) or raises ValueError with a user-facing message."""
+def parse_workbook(file, column_map=None):
+    """
+    Returns (column_map, data_rows) or raises ValueError with a user-facing
+    message. `column_map` lets a caller pass the farm's own confirmed
+    mapping (from the column-mapping step) instead of relying on
+    alias auto-detection — preview and commit must be called with the same
+    explicit map so a farm's confirmed choices are respected on commit too.
+    """
     try:
         wb = openpyxl.load_workbook(file, data_only=True)
         ws = wb.active
@@ -102,7 +145,8 @@ def parse_workbook(file):
         raise ValueError("The file is empty.")
 
     header_row = rows[0]
-    column_map = build_column_map(header_row)
+    if column_map is None:
+        column_map = build_column_map(header_row)
 
     missing = [f for f in REQUIRED_FIELDS if f not in column_map]
     if missing:
