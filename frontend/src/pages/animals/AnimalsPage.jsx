@@ -6,6 +6,7 @@ import { DataTable, Pagination, Modal, ConfirmDialog, StatusBadge, SearchInput, 
 import { Plus, Beef, Eye, Pencil, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const STATUSES = ['heifer','open','inseminated','pregnant','dry','sick','sold','dead','culled']
 
@@ -160,6 +161,9 @@ export default function AnimalsPage() {
 
   return (
     <div>
+      <PageInfoCard pageKey="animals" title="Animal Registry">
+        Every animal on your farm lives here. Add them one by one, or bring in an existing spreadsheet from the Import Data page.
+      </PageInfoCard>
       <div className="page-header">
         <h1 className="page-title">Animal Registry</h1>
         <button className="btn btn-primary" onClick={() => setModal('create')}><Plus size={16} />Add Animal</button>

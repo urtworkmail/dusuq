@@ -4,6 +4,7 @@ import { StatCard, PageSpinner } from '@/components/ui'
 import { Beef, Droplets, Heart, Package, Calendar, TrendingUp, AlertTriangle, Syringe } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts'
 import { format } from 'date-fns'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const COLORS = ['#1A6B3C', '#2e8b57', '#4db37f', '#87d0aa', '#bbe5cc']
 
@@ -28,6 +29,9 @@ export default function DashboardPage() {
 
   return (
     <div>
+      <PageInfoCard pageKey="dashboard" title="Your farm at a glance">
+        This dashboard gives you a live snapshot of your herd, milk, health and inventory — everything else in the sidebar drills into more detail.
+      </PageInfoCard>
       <div className="page-header">
         <h1 className="page-title">Executive Dashboard</h1>
         <p className="text-sm text-gray-500">{format(new Date(), 'EEEE, d MMMM yyyy')}</p>

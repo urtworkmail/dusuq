@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import NotificationBell from '@/components/layout/NotificationBell'
+import GuidedTour from '@/components/onboarding/GuidedTour'
+import OnboardingChecklist from '@/components/onboarding/OnboardingChecklist'
 import {
   LayoutDashboard, Beef, Heart, Droplets, DollarSign,
   Package, BarChart2, Settings, LogOut, Menu, X,
@@ -11,17 +13,17 @@ import clsx from 'clsx'
 
 const NAV = [
   { to: '/',            label: 'Dashboard',    icon: LayoutDashboard, exact: true },
-  { to: '/animals',     label: 'Animals',       icon: Beef },
-  { to: '/reproduction',label: 'Reproduction',  icon: Syringe },
+  { to: '/animals',     label: 'Animals',       icon: Beef, tour: 'animals' },
+  { to: '/reproduction',label: 'Reproduction',  icon: Syringe, tour: 'reproduction' },
   { to: '/health',      label: 'Health',        icon: Heart },
-  { to: '/milk',        label: 'Milk Production',icon: Droplets },
+  { to: '/milk',        label: 'Milk Production',icon: Droplets, tour: 'milk' },
   { to: '/accounts',    label: 'Accounts',      icon: DollarSign },
   { to: '/inventory',   label: 'Inventory',     icon: Package },
-  { to: '/reports',     label: 'Reports',       icon: BarChart2 },
+  { to: '/reports',     label: 'Reports',       icon: BarChart2, tour: 'reports' },
   { to: '/vetassist',   label: 'VetAssist',     icon: Sparkles },
   { to: '/payroll',     label: 'Payroll',       icon: Users },
-  { to: '/data-import', label: 'Import Data',   icon: UploadCloud },
-  { to: '/settings',    label: 'Settings',      icon: Settings },
+  { to: '/data-import', label: 'Import Data',   icon: UploadCloud, tour: 'data-import' },
+  { to: '/settings',    label: 'Settings',      icon: Settings, tour: 'settings' },
   { to: '/support',     label: 'ERP Support',   icon: LifeBuoy },
 ]
 
@@ -32,6 +34,7 @@ function NavItem({ item, onClick }) {
       to={item.to}
       end={item.exact}
       onClick={onClick}
+      data-tour={item.tour ? `nav-${item.tour}` : undefined}
       className={({ isActive }) =>
         clsx(
           'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
@@ -145,6 +148,9 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      <GuidedTour />
+      <OnboardingChecklist />
     </div>
   )
 }

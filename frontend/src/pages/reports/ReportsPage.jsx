@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Download, BarChart2, TrendingUp, TrendingDown, Minus, Baby, Milk } from 'lucide-react'
 import { format } from 'date-fns'
 import toast from 'react-hot-toast'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const today = format(new Date(), 'yyyy-MM-dd')
 const monthStart = today.slice(0, 8) + '01'
@@ -207,6 +208,9 @@ function ForecastSection() {
 export default function ReportsPage() {
   return (
     <div>
+      <PageInfoCard pageKey="reports" title="Reports Hub">
+        Run any report on demand and export it to Excel — forecasts and projections are at the top.
+      </PageInfoCard>
       <div className="page-header">
         <h1 className="page-title">Reports Hub</h1>
         <p className="text-sm text-gray-500">Run any report and export to Excel</p>

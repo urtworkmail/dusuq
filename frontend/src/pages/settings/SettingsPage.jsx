@@ -8,6 +8,7 @@ import { Save, Send, Plus, Trash2, Pencil, Shield } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import clsx from 'clsx'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/settings',         label: 'Farm Profile', end: true },
@@ -516,6 +517,9 @@ function MyAccountTab() {
 export default function SettingsPage() {
   return (
     <div>
+      <PageInfoCard pageKey="settings" title="Settings">
+        Complete your farm profile, configure email, manage sheds &amp; breeds, and invite your team.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Settings</h1>
       <TabBar />
       <Routes>

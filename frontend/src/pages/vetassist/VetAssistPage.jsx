@@ -4,6 +4,7 @@ import { Spinner, EmptyState } from '@/components/ui'
 import { Sparkles, Send, FileText, TrendingUp, AlertCircle } from 'lucide-react'
 import clsx from 'clsx'
 import toast from 'react-hot-toast'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { key: 'ask',      label: 'Ask a Question', icon: Sparkles },
@@ -290,6 +291,9 @@ export default function VetAssistPage() {
 
   return (
     <div>
+      <PageInfoCard pageKey="vetassist" title="VetAssist">
+        Ask questions about your herd in plain language — answers are grounded in your farm's own data.
+      </PageInfoCard>
       <div className="page-header">
         <h1 className="page-title flex items-center gap-2">
           <Sparkles size={22} className="text-primary-600" />

@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { format, subMonths, startOfMonth } from 'date-fns'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/reproduction',             label: 'Dashboard',        end: true },
@@ -425,6 +426,9 @@ export default function ReproductionPage() {
 
   return (
     <div>
+      <PageInfoCard pageKey="reproduction" title="Reproduction Management">
+        Log inseminations, pregnancy checks, calvings, dry-offs and abortions — the Expected Tasks tab tells you what's due next.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Reproduction Management</h1>
       <TabBar />
       <Routes>

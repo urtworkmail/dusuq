@@ -7,6 +7,7 @@ import { Plus, Users, DollarSign, Wallet, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { format } from 'date-fns'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/payroll', label: 'Employees', end: true },
@@ -212,6 +213,9 @@ function AdvancesTab() {
 export default function PayrollPage() {
   return (
     <div>
+      <PageInfoCard pageKey="payroll" title="Payroll">
+        Manage employees, log salary payments and advances, and track what's owed to each worker.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Payroll</h1>
       <TabBar />
       <Routes>

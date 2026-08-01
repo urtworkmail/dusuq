@@ -227,6 +227,13 @@ export const importAPI = {
   },
 }
 
+// ─── Onboarding (checklist + guided tour) ─────────────────────────────────────
+export const onboardingAPI = {
+  status:           () => api.get('/onboarding/status/'),
+  markTourComplete: () => api.post('/onboarding/tour-complete/'),
+  dismissChecklist: () => api.post('/onboarding/dismiss-checklist/'),
+}
+
 // ─── Notifications ────────────────────────────────────────────────────────────
 export const notifAPI = {
   list:         (params) => api.get('/notifications/', { params }),

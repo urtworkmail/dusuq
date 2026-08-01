@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { format } from 'date-fns'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/accounts', label: 'Dashboard', end: true },
@@ -447,6 +448,9 @@ function BalanceSheetTab() {
 export default function AccountsPage() {
   return (
     <div>
+      <PageInfoCard pageKey="accounts" title="Finance &amp; Accounts">
+        Track transactions and assets, and generate your P&amp;L, ledger, trial balance and balance sheet.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Finance & Accounts</h1>
       <TabBar />
       <Routes>

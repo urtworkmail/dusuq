@@ -41,6 +41,7 @@ urlpatterns = [
     path("api/subscriptions/", include("apps.subscriptions.urls")),
     path("api/payroll/", include("apps.payroll.urls")),
     path("api/data-import/", include("apps.data_import.urls")),
+    path("api/onboarding/", include("apps.onboarding.urls")),
 
     # Platform (SaaS owner) admin — superuser-only, cross-tenant. Exempted
     # from TenantMiddleware's tenant resolution (see apps/tenants/middleware.py

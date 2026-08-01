@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { format } from 'date-fns'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/health', label: 'Dashboard', end: true },
@@ -404,6 +405,9 @@ export default function HealthPage() {
 
   return (
     <div>
+      <PageInfoCard pageKey="health" title="Health Management">
+        Track treatments, vaccinations, deworming and disease events for every animal on the farm.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Health Management</h1>
       <TabBar />
       <Routes>

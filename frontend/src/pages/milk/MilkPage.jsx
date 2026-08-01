@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { format } from 'date-fns'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/milk', label: 'Dashboard', end: true },
@@ -409,6 +410,9 @@ function RecordsTab() {
 export default function MilkPage() {
   return (
     <div>
+      <PageInfoCard pageKey="milk" title="Milk Production">
+        Record daily AM/PM yields, manage chiller readings, consumption and dispatch to buyers.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Milk Production</h1>
       <TabBar />
       <Routes>

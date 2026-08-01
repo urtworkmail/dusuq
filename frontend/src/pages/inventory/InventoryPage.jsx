@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { format } from 'date-fns'
 import clsx from 'clsx'
+import PageInfoCard from '@/components/onboarding/PageInfoCard'
 
 const TABS = [
   { to: '/inventory', label: 'Dashboard', end: true },
@@ -323,6 +324,9 @@ function FeedRationsTab() {
 export default function InventoryPage() {
   return (
     <div>
+      <PageInfoCard pageKey="inventory" title="Stock &amp; Inventory">
+        Manage feed and supply stock levels, log consumption, and plan feed rations.
+      </PageInfoCard>
       <h1 className="page-title mb-4">Stock & Inventory</h1>
       <TabBar />
       <Routes>
