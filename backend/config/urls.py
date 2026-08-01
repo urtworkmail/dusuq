@@ -2,13 +2,18 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.decorators.cache import cache_page
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
 
-    # API schema
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    # API schema — drf-spectacular re-introspects every view/serializer in
+    # the whole project on every single request with no caching of its own,
+    # which got slow enough (60+s) to be a real problem as the API surface
+    # grew. The schema is static between deploys, so cache it for a day —
+    # Django's implicit default LocMemCache is enough, no new infra needed.
+    path("api/schema/", cache_page(60 * 60 * 24)(SpectacularAPIView.as_view()), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 
     # Health check (no auth)
