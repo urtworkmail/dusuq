@@ -19,6 +19,7 @@ import InventoryPage from '@/pages/inventory/InventoryPage'
 import ReportsPage from '@/pages/reports/ReportsPage'
 import VetAssistPage from '@/pages/vetassist/VetAssistPage'
 import PayrollPage from '@/pages/payroll/PayrollPage'
+import ImportPage from '@/pages/data-import/ImportPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
 import SupportPage from '@/pages/support/SupportPage'
 
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="reports/*" element={<ReportsPage />} />
         <Route path="vetassist/*" element={<VetAssistPage />} />
         <Route path="payroll/*" element={<PayrollPage />} />
+        <Route path="data-import" element={<ImportPage />} />
         <Route path="settings/*" element={<SettingsPage />} />
         <Route path="support" element={<SupportPage />} />
       </Route>

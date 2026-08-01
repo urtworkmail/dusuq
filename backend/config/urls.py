@@ -40,6 +40,7 @@ urlpatterns = [
     path("api/vetassist/", include("apps.vetassist.urls")),
     path("api/subscriptions/", include("apps.subscriptions.urls")),
     path("api/payroll/", include("apps.payroll.urls")),
+    path("api/data-import/", include("apps.data_import.urls")),
 
     # Platform (SaaS owner) admin — superuser-only, cross-tenant. Exempted
     # from TenantMiddleware's tenant resolution (see apps/tenants/middleware.py
