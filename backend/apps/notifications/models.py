@@ -2,6 +2,7 @@ from django.db import models
 
 
 class NotificationType(models.TextChoices):
+    INSEMINATION_DUE = "insemination_due", "Insemination Due"
     CALVING_DUE = "calving_due", "Calving Due"
     PREG_CHECK_DUE = "preg_check_due", "Pregnancy Check Due"
     DRY_OFF_DUE = "dry_off_due", "Dry-off Due"

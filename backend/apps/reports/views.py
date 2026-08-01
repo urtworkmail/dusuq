@@ -87,7 +87,13 @@ def report_inseminations(request):
             "animal_name": r.animal.name,
             "type": r.get_insemination_type_display(),
             "semen_batch": r.semen_batch,
+            "bull_tag": r.bull_tag,
             "technician": r.technician.get_full_name() if r.technician else "",
+            "vet_practitioner_number": r.veterinary_practitioner_number,
+            "source_company": r.semen_source_company,
+            "supplier_company": r.semen_supplier_company,
+            "bull_breed": r.bull_breed,
+            "donor_dam_breed": r.donor_dam_breed,
             "repeat": r.repeat_number,
             "expected_calving": str(r.expected_calving_date),
         }
@@ -99,7 +105,11 @@ def report_inseminations(request):
         ws = wb.active
         ws.title = "Inseminations"
         _write_title(ws, "Insemination Report", tenant.name)
-        headers = ["Date", "Tag", "Name", "Type", "Semen Batch", "Technician", "Repeat #", "Expected Calving"]
+        headers = [
+            "Date", "Tag", "Name", "Type", "Semen/Embryo Batch", "Bull Tag", "Technician",
+            "Vet Practitioner #", "Source Company", "Supplier Company", "Sire Breed",
+            "Donor Dam Breed", "Repeat #", "Expected Calving",
+        ]
         ws.append(headers)
         _style_header_row(ws, 3, len(headers))
         for r in rows:

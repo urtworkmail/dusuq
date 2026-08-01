@@ -3,8 +3,9 @@ from django.utils import timezone
 
 
 class InseminationType(models.TextChoices):
+    NATURAL = "natural", "Natural Service"
     AI = "ai", "Artificial Insemination"
-    BULL = "bull", "Natural Service (Bull)"
+    EMBRYO = "embryo", "Embryo Transfer"
 
 
 class PregnancyTestMethod(models.TextChoices):
@@ -38,9 +39,25 @@ class Insemination(models.Model):
     )
     date = models.DateField()
 
-    # AI-specific
-    semen_batch = models.CharField(max_length=100, blank=True)
-    bull_breed = models.CharField(max_length=100, blank=True)
+    # AI / Embryo — sourcing & traceability
+    semen_batch = models.CharField(
+        max_length=100, blank=True, verbose_name="Semen/Embryo Batch Number"
+    )
+    semen_source_company = models.CharField(
+        max_length=200, blank=True,
+        help_text="Company that collected/developed the semen or embryo",
+    )
+    semen_supplier_company = models.CharField(
+        max_length=200, blank=True,
+        help_text="Company/distributor that supplied it to the farm (may differ from the source company)",
+    )
+    bull_breed = models.CharField(
+        max_length=100, blank=True, verbose_name="Bull/Sire Breed"
+    )
+    donor_dam_breed = models.CharField(
+        max_length=100, blank=True, verbose_name="Donor Dam Breed",
+        help_text="Embryo transfer only — breed of the genetic dam (donor cow), distinct from the recipient animal",
+    )
     technician = models.ForeignKey(
         "users.User",
         on_delete=models.SET_NULL,
@@ -48,8 +65,12 @@ class Insemination(models.Model):
         blank=True,
         related_name="inseminations_done",
     )
+    veterinary_practitioner_number = models.CharField(
+        max_length=100, blank=True,
+        help_text="License/registration number of the vet who performed the procedure, if performed by an external practitioner",
+    )
 
-    # Bull service
+    # Natural service
     bull_tag = models.CharField(max_length=50, blank=True)
 
     repeat_number = models.PositiveSmallIntegerField(

@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 @shared_task(bind=True, max_retries=3, default_retry_delay=300)
 def run_daily_alerts(self):
     """Master task: dispatches all daily alert sub-tasks."""
+    check_insemination_due.delay()
     check_calving_due.delay()
     check_pregnancy_check_due.delay()
     check_dry_off_due.delay()
@@ -21,6 +22,85 @@ def run_daily_alerts(self):
     check_treatment_followups.delay()
     check_low_stock.delay()
     check_milk_drop.delay()
+
+
+@shared_task
+def check_insemination_due():
+    """
+    Two real cases for "due for insemination," since a negative PD test does
+    not automatically flip Animal.status back in this codebase (checked
+    directly rather than assumed):
+
+    1. Postpartum, never bred: status=open, calved 45-52 days ago (past the
+       standard ~45-day voluntary waiting period) with no insemination since.
+    2. Repeat breeding after a negative/repeat PD test: the animal's most
+       recent insemination has a linked pregnancy test with a negative/repeat
+       result, and today falls in the ~21-day-later repeat-heat window
+       (18-24 days after the test), with no newer insemination recorded.
+    """
+    from apps.tenants.models import Tenant
+    from apps.animals.models import Animal, AnimalStatus
+    from apps.reproduction.models import Insemination, PregnancyTest, Calving, PregnancyResult
+    from apps.notifications.service import broadcast_to_roles
+    from apps.notifications.models import NotificationType
+
+    today = date.today()
+
+    for tenant in Tenant.objects.filter(is_active=True):
+        # Case 1: postpartum, never rebred
+        for animal in Animal.objects.filter(tenant=tenant, is_active=True, status=AnimalStatus.OPEN):
+            last_calving = Calving.objects.filter(tenant=tenant, dam=animal).order_by("-calving_date").first()
+            if not last_calving:
+                continue
+            days_since_calving = (today - last_calving.calving_date).days
+            if not (45 <= days_since_calving <= 52):
+                continue
+            bred_since = Insemination.objects.filter(
+                tenant=tenant, animal=animal, date__gt=last_calving.calving_date
+            ).exists()
+            if bred_since:
+                continue
+            broadcast_to_roles(
+                tenant=tenant,
+                roles=["owner", "manager", "veterinary", "technician"],
+                notif_type=NotificationType.INSEMINATION_DUE,
+                title=f"Insemination Due: {animal.display_name}",
+                message=(
+                    f"{animal.display_name} (Tag: {animal.tag_number}) calved {days_since_calving} "
+                    f"day(s) ago and hasn't been bred since — past the voluntary waiting period."
+                ),
+                link=f"/reproduction/animals/{animal.id}/",
+            )
+
+        # Case 2: repeat breeding after a negative/repeat PD test
+        for animal in Animal.objects.filter(tenant=tenant, is_active=True, status=AnimalStatus.INSEMINATED):
+            last_ins = Insemination.objects.filter(tenant=tenant, animal=animal).order_by("-date").first()
+            if not last_ins:
+                continue
+            last_test = PregnancyTest.objects.filter(
+                tenant=tenant, insemination=last_ins
+            ).order_by("-date").first()
+            if not last_test or last_test.result not in (PregnancyResult.NEGATIVE, PregnancyResult.REPEAT):
+                continue
+            days_since_test = (today - last_test.date).days
+            if not (18 <= days_since_test <= 24):
+                continue
+            newer_insemination = Insemination.objects.filter(
+                tenant=tenant, animal=animal, date__gt=last_test.date
+            ).exists()
+            if newer_insemination:
+                continue
+            broadcast_to_roles(
+                tenant=tenant,
+                roles=["owner", "manager", "veterinary", "technician"],
+                notif_type=NotificationType.INSEMINATION_DUE,
+                title=f"Repeat Insemination Due: {animal.display_name}",
+                message=(
+                    f"{animal.display_name} (Tag: {animal.tag_number}) tested {last_test.get_result_display().lower()} "
+                    f"on {last_test.date} — likely due for its next heat cycle now."
+                ),
+                link=f"/reproduction/animals/{animal.id}/",
+            )
 
 
 @shared_task

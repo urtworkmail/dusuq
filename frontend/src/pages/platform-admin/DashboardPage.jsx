@@ -1,34 +1,12 @@
-import { useState } from 'react'
-import { Routes, Route, NavLink } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { platformAdminAPI } from '@/api/endpoints'
-import { StatCard, PageSpinner, DataTable, Pagination } from '@/components/ui'
+import { StatCard, PageSpinner } from '@/components/ui'
 import {
   Users, Building2, TrendingUp, Wallet, Wifi, Ticket,
-  Beef, Droplets, Sparkles, Server, Activity, ScrollText,
+  Beef, Droplets, Sparkles, Server, Activity,
 } from 'lucide-react'
 
-const TABS = [
-  { to: '/platform-admin', label: 'Dashboard', end: true },
-  { to: '/platform-admin/live', label: 'Live' },
-  { to: '/platform-admin/audit-log', label: 'Audit Log' },
-]
-
-function TabBar() {
-  return (
-    <div className="flex overflow-x-auto gap-1 border-b border-gray-200 mb-5">
-      {TABS.map(t => (
-        <NavLink key={t.to} to={t.to} end={t.end}
-          className={({ isActive }) =>
-            `px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-colors ${
-              isActive ? 'border-primary-600 text-primary-700' : 'border-transparent text-gray-500 hover:text-gray-800'
-            }`}>{t.label}</NavLink>
-      ))}
-    </div>
-  )
-}
-
-function DashboardTab() {
+export default function DashboardPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['platform-admin-dashboard'],
     queryFn: () => platformAdminAPI.dashboard().then(r => r.data),
@@ -43,6 +21,8 @@ function DashboardTab() {
 
   return (
     <div className="space-y-6">
+      <h1 className="page-title">Platform Dashboard</h1>
+
       <div>
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Users</h3>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
@@ -129,63 +109,6 @@ function DashboardTab() {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function LiveTab() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['platform-admin-live'],
-    queryFn: () => platformAdminAPI.live().then(r => r.data),
-    refetchInterval: 10000,
-  })
-  if (isLoading) return <PageSpinner />
-  return (
-    <div className="space-y-4">
-      <p className="text-xs text-gray-400">Updates every 10 seconds. Last updated: {data?.timestamp ? new Date(data.timestamp).toLocaleTimeString() : '—'}</p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard label="Online Now" value={data?.online_now ?? '—'} icon={Wifi} color="bg-green-50" iconColor="text-green-600" />
-        <StatCard label="New Sign-ups Today" value={data?.new_signups_today ?? '—'} icon={Users} />
-        <StatCard label="New Farms Today" value={data?.new_farms_today ?? '—'} icon={Building2} />
-        <StatCard label="Payments Today" value={data?.payments_today ?? '—'} icon={Wallet} sub={data?.payments_amount_today_pkr != null ? `PKR ${Number(data.payments_amount_today_pkr).toLocaleString()}` : undefined} />
-      </div>
-    </div>
-  )
-}
-
-function AuditLogTab() {
-  const [page, setPage] = useState(1)
-  const { data, isLoading } = useQuery({
-    queryKey: ['platform-admin-audit-log', page],
-    queryFn: () => platformAdminAPI.auditLog({ page }).then(r => r.data),
-  })
-  const cols = [
-    { key: 'created_at', label: 'When', render: v => new Date(v).toLocaleString() },
-    { key: 'action_display', label: 'Action' },
-    { key: 'tenant_name', label: 'Farm', render: v => v || '—' },
-    { key: 'user_email', label: 'User', render: v => v || '—' },
-    { key: 'description', label: 'Description' },
-    { key: 'ip_address', label: 'IP', render: v => v || '—' },
-  ]
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-4 text-sm text-gray-500"><ScrollText size={16} />Platform-wide activity log</div>
-      <div className="card p-0"><DataTable columns={cols} data={data?.results ?? []} loading={isLoading} /></div>
-      <Pagination count={data?.count} page={page} onPage={setPage} />
-    </div>
-  )
-}
-
-export default function PlatformAdminPage() {
-  return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="page-title mb-4">Platform Admin</h1>
-      <TabBar />
-      <Routes>
-        <Route index element={<DashboardTab />} />
-        <Route path="live" element={<LiveTab />} />
-        <Route path="audit-log" element={<AuditLogTab />} />
-      </Routes>
     </div>
   )
 }

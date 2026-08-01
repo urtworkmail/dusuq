@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import AppLayout from '@/components/layout/AppLayout'
+import PlatformAdminLayout from '@/components/layout/PlatformAdminLayout'
 
 // Auth pages
 import LoginPage from '@/pages/auth/LoginPage'
@@ -20,7 +21,20 @@ import VetAssistPage from '@/pages/vetassist/VetAssistPage'
 import PayrollPage from '@/pages/payroll/PayrollPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
 import SupportPage from '@/pages/support/SupportPage'
-import PlatformAdminPage from '@/pages/platform-admin/PlatformAdminPage'
+
+// Platform admin pages
+import PlatformDashboardPage from '@/pages/platform-admin/DashboardPage'
+import PlatformLivePage from '@/pages/platform-admin/LivePage'
+import PlatformAnalyticsPage from '@/pages/platform-admin/AnalyticsPage'
+import FarmsPage from '@/pages/platform-admin/FarmsPage'
+import FarmDetailPage from '@/pages/platform-admin/FarmDetailPage'
+import UsersPage from '@/pages/platform-admin/UsersPage'
+import PlansPage from '@/pages/platform-admin/PlansPage'
+import SubscriptionsPage from '@/pages/platform-admin/SubscriptionsPage'
+import InvoicesPage from '@/pages/platform-admin/InvoicesPage'
+import AIUsagePage from '@/pages/platform-admin/AIUsagePage'
+import SupportTicketsPage from '@/pages/platform-admin/SupportTicketsPage'
+import AuditLogPage from '@/pages/platform-admin/AuditLogPage'
 
 function RequireAuth({ children }) {
   const { user } = useAuth()
@@ -74,7 +88,20 @@ export default function App() {
       </Route>
 
       {/* Platform admin — separate shell, no tenant context, superuser-only */}
-      <Route path="/platform-admin/*" element={<RequirePlatformAdmin><PlatformAdminPage /></RequirePlatformAdmin>} />
+      <Route path="/platform-admin" element={<RequirePlatformAdmin><PlatformAdminLayout /></RequirePlatformAdmin>}>
+        <Route index element={<PlatformDashboardPage />} />
+        <Route path="live" element={<PlatformLivePage />} />
+        <Route path="analytics" element={<PlatformAnalyticsPage />} />
+        <Route path="farms" element={<FarmsPage />} />
+        <Route path="farms/:id" element={<FarmDetailPage />} />
+        <Route path="users" element={<UsersPage />} />
+        <Route path="plans" element={<PlansPage />} />
+        <Route path="subscriptions" element={<SubscriptionsPage />} />
+        <Route path="invoices" element={<InvoicesPage />} />
+        <Route path="ai-usage" element={<AIUsagePage />} />
+        <Route path="support-tickets" element={<SupportTicketsPage />} />
+        <Route path="audit-log" element={<AuditLogPage />} />
+      </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -160,9 +160,31 @@ export const payrollAPI = {
 
 // ─── Platform Admin (SaaS owner, superuser-only) ───────────────────────────────
 export const platformAdminAPI = {
-  dashboard: () => api.get('/platform-admin/dashboard/'),
-  live:      () => api.get('/platform-admin/live/'),
+  dashboard: ()       => api.get('/platform-admin/dashboard/'),
+  live:      ()       => api.get('/platform-admin/live/'),
+  analytics: (params) => api.get('/platform-admin/analytics/', { params }),
   auditLog:  (params) => api.get('/platform-admin/audit-log/', { params }),
+
+  listFarms:   (params) => api.get('/platform-admin/farms/', { params }),
+  getFarm:     (id)     => api.get(`/platform-admin/farms/${id}/`),
+  toggleFarmActive: (id, is_active) => api.post(`/platform-admin/farms/${id}/toggle-active/`, { is_active }),
+
+  listUsers: (params) => api.get('/platform-admin/users/', { params }),
+
+  listPlans:  ()          => api.get('/platform-admin/plans/'),
+  createPlan: (data)      => api.post('/platform-admin/plans/', data),
+  updatePlan: (id, data)  => api.patch(`/platform-admin/plans/${id}/`, data),
+
+  listSubscriptions:  (params) => api.get('/platform-admin/subscriptions/', { params }),
+  updateSubscription: (id, data) => api.patch(`/platform-admin/subscriptions/${id}/`, data),
+
+  listInvoices:  (params) => api.get('/platform-admin/invoices/', { params }),
+  updateInvoice: (id, data) => api.patch(`/platform-admin/invoices/${id}/`, data),
+
+  listAIUsage: (params) => api.get('/platform-admin/ai-usage/', { params }),
+
+  listSupportTickets:  (params) => api.get('/platform-admin/support-tickets/', { params }),
+  updateSupportTicket: (id, data) => api.patch(`/platform-admin/support-tickets/${id}/`, data),
 }
 
 // ─── Inventory ────────────────────────────────────────────────────────────────

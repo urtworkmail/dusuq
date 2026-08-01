@@ -154,15 +154,20 @@ function InseminationForm({ onSubmit, loading }) {
         <FormField label="Type" required>
           <select {...register('insemination_type')} className="form-select">
             <option value="ai">Artificial Insemination</option>
-            <option value="bull">Natural Service (Bull)</option>
+            <option value="natural">Natural Service</option>
+            <option value="embryo">Embryo Transfer</option>
           </select>
         </FormField>
         <FormField label="Repeat #">
           <input type="number" min={1} {...register('repeat_number')} className="form-input" />
         </FormField>
-        {type === 'ai' ? (
+        {type === 'natural' ? (
+          <FormField label="Bull Tag">
+            <input {...register('bull_tag')} className="form-input" />
+          </FormField>
+        ) : (
           <>
-            <FormField label="Semen Batch">
+            <FormField label={type === 'embryo' ? 'Embryo Batch Number' : 'Semen Batch'}>
               <input {...register('semen_batch')} className="form-input" />
             </FormField>
             <FormField label="Technician">
@@ -173,14 +178,24 @@ function InseminationForm({ onSubmit, loading }) {
                 ))}
               </select>
             </FormField>
-            <FormField label="Bull Breed">
+            <FormField label="Veterinary Practitioner Number">
+              <input {...register('veterinary_practitioner_number')} className="form-input" placeholder="If performed by an external vet" />
+            </FormField>
+            <FormField label="Source Company">
+              <input {...register('semen_source_company')} className="form-input" placeholder={type === 'embryo' ? 'Embryo development company' : 'Semen collection company'} />
+            </FormField>
+            <FormField label="Supplier Company">
+              <input {...register('semen_supplier_company')} className="form-input" placeholder="Distributor that supplied it to the farm" />
+            </FormField>
+            <FormField label={type === 'embryo' ? 'Donor Sire (Bull) Breed' : 'Bull Breed'}>
               <input {...register('bull_breed')} className="form-input" placeholder="Breed of sire" />
             </FormField>
+            {type === 'embryo' && (
+              <FormField label="Donor Dam (Cow) Breed">
+                <input {...register('donor_dam_breed')} className="form-input" placeholder="Breed of the genetic dam" />
+              </FormField>
+            )}
           </>
-        ) : (
-          <FormField label="Bull Tag">
-            <input {...register('bull_tag')} className="form-input" />
-          </FormField>
         )}
       </div>
       <FormField label="Notes"><textarea {...register('notes')} rows={2} className="form-input" /></FormField>
@@ -360,9 +375,15 @@ export default function ReproductionPage() {
     { key: 'date', label: 'Date' },
     { key: 'animal_tag', label: 'Tag' },
     { key: 'animal_name', label: 'Name' },
-    { key: 'insemination_type', label: 'Type', render: v => v === 'ai' ? 'AI' : 'Bull' },
-    { key: 'semen_batch', label: 'Batch/Bull' },
+    { key: 'insemination_type', label: 'Type', render: v => ({ ai: 'AI', natural: 'Natural', embryo: 'Embryo' }[v] ?? v) },
+    { key: 'semen_batch', label: 'Batch' },
+    { key: 'bull_tag', label: 'Bull Tag' },
     { key: 'technician_name', label: 'Technician' },
+    { key: 'veterinary_practitioner_number', label: 'Vet License #' },
+    { key: 'semen_source_company', label: 'Source Co.' },
+    { key: 'semen_supplier_company', label: 'Supplier Co.' },
+    { key: 'bull_breed', label: 'Sire Breed' },
+    { key: 'donor_dam_breed', label: 'Donor Dam Breed' },
     { key: 'repeat_number', label: 'Repeat #' },
     { key: 'expected_calving_date', label: 'ECD' },
   ]
