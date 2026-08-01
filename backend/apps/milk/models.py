@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator
 
 class MilkSession(models.TextChoices):
     AM = "am", "Morning (AM)"
+    MIDDAY = "midday", "Midday"
     PM = "pm", "Evening (PM)"
 
 
@@ -11,7 +12,7 @@ class MilkRecord(models.Model):
     tenant = models.ForeignKey("tenants.Tenant", on_delete=models.CASCADE, related_name="milk_records")
     animal = models.ForeignKey("animals.Animal", on_delete=models.CASCADE, related_name="milk_records")
     date = models.DateField()
-    session = models.CharField(max_length=5, choices=MilkSession.choices)
+    session = models.CharField(max_length=10, choices=MilkSession.choices)
     litres = models.DecimalField(max_digits=7, decimal_places=2, validators=[MinValueValidator(0)])
     fat_percent = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
     snf_percent = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)

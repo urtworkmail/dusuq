@@ -303,7 +303,7 @@ def report_vaccinations(request):
 @permission_classes([IsAuthenticated])
 def report_milk_daywise(request):
     from apps.milk.models import MilkRecord
-    from django.db.models import Sum
+    from django.db.models import Q, Sum
     tenant = request.tenant
     date_from = request.query_params.get("date_from", str(date.today().replace(day=1)))
     date_to = request.query_params.get("date_to", str(date.today()))
@@ -312,8 +312,9 @@ def report_milk_daywise(request):
         MilkRecord.objects.filter(tenant=tenant, date__gte=date_from, date__lte=date_to)
         .values("date")
         .annotate(
-            am=Sum("litres", filter=__import__("django.db.models", fromlist=["Q"]).Q(session="am")),
-            pm=Sum("litres", filter=__import__("django.db.models", fromlist=["Q"]).Q(session="pm")),
+            am=Sum("litres", filter=Q(session="am")),
+            midday=Sum("litres", filter=Q(session="midday")),
+            pm=Sum("litres", filter=Q(session="pm")),
             total=Sum("litres"),
         )
         .order_by("date")
@@ -325,16 +326,19 @@ def report_milk_daywise(request):
         ws = wb.active
         ws.title = "Daily Milk"
         _write_title(ws, "Day-wise Milk Report", tenant.name)
-        headers = ["Date", "AM (L)", "PM (L)", "Total (L)"]
+        headers = ["Date", "AM (L)", "Midday (L)", "PM (L)", "Total (L)"]
         ws.append(headers)
         _style_header_row(ws, 3, len(headers))
         for r in rows:
-            ws.append([str(r["date"]), float(r["am"] or 0), float(r["pm"] or 0), float(r["total"] or 0)])
+            ws.append([str(r["date"]), float(r["am"] or 0), float(r["midday"] or 0), float(r["pm"] or 0), float(r["total"] or 0)])
         _auto_width(ws)
         return _excel_response(wb, f"milk_daywise_{date.today()}.xlsx")
 
     serializable = [
-        {"date": str(r["date"]), "am": float(r["am"] or 0), "pm": float(r["pm"] or 0), "total": float(r["total"] or 0)}
+        {
+            "date": str(r["date"]), "am": float(r["am"] or 0), "midday": float(r["midday"] or 0),
+            "pm": float(r["pm"] or 0), "total": float(r["total"] or 0),
+        }
         for r in rows
     ]
     return Response({"results": serializable})

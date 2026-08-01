@@ -208,22 +208,25 @@ export const inventoryAPI = {
 }
 
 // ─── Data Import (connectors) ───────────────────────────────────────────────────
+// One preview/commit/template triplet per data type, all shaped the same way
+// server-side (see backend/apps/data_import/urls.py) — kept generic here so
+// adding a new importable data type never needs a frontend endpoints change.
 export const importAPI = {
   listJobs: (params) => api.get('/data-import/jobs/', { params }),
-  animalsTemplate: () => api.get('/data-import/animals/template/', { responseType: 'blob' }),
+  template: (dataType) => api.get(`/data-import/${dataType}/template/`, { responseType: 'blob' }),
   // Content-Type deliberately left unset (not 'multipart/form-data') so the
   // browser auto-generates it WITH the required boundary parameter — the
   // axios instance's default 'application/json' header would otherwise
   // persist and silently break the upload.
-  animalsPreview: (file) => {
+  preview: (dataType, file) => {
     const fd = new FormData()
     fd.append('file', file)
-    return api.post('/data-import/animals/preview/', fd, { headers: { 'Content-Type': undefined } })
+    return api.post(`/data-import/${dataType}/preview/`, fd, { headers: { 'Content-Type': undefined } })
   },
-  animalsCommit: (file) => {
+  commit: (dataType, file) => {
     const fd = new FormData()
     fd.append('file', file)
-    return api.post('/data-import/animals/commit/', fd, { headers: { 'Content-Type': undefined } })
+    return api.post(`/data-import/${dataType}/commit/`, fd, { headers: { 'Content-Type': undefined } })
   },
 }
 

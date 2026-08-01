@@ -85,8 +85,11 @@ export default function OnboardingChecklist() {
                 <Circle size={18} className="text-gray-300 flex-shrink-0 mt-0.5" />
               )}
               <span>
-                <span className={clsx('block text-sm font-medium', step.done ? 'text-gray-400 line-through' : 'text-gray-800')}>
+                <span className={clsx('flex items-center gap-1.5 text-sm font-medium', step.done ? 'text-gray-400 line-through' : 'text-gray-800')}>
                   {step.label}
+                  {step.optional && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wide text-primary-500 bg-primary-50 rounded-full px-1.5 py-0.5 no-underline">Optional</span>
+                  )}
                 </span>
                 <span className="block text-xs text-gray-400 mt-0.5">{step.description}</span>
               </span>

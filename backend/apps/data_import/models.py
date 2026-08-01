@@ -3,6 +3,8 @@ from django.db import models
 
 class ImportDataType(models.TextChoices):
     ANIMALS = "animals", "Animals"
+    MILK = "milk", "Milk Records"
+    INSEMINATIONS = "inseminations", "Inseminations"
 
 
 class ImportStatus(models.TextChoices):

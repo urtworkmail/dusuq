@@ -113,8 +113,8 @@ const REPORTS = [
   {
     group: '🥛 Milk',
     items: [
-      { title: 'Day-wise Milk Report', description: 'Daily AM/PM production totals', apiKey: 'milk/daywise', endpoint: reportsAPI.milkDaywise, columns: [
-        { key: 'date', label: 'Date' }, { key: 'am', label: 'AM (L)' }, { key: 'pm', label: 'PM (L)' }, { key: 'total', label: 'Total (L)' },
+      { title: 'Day-wise Milk Report', description: 'Daily AM/Midday/PM production totals', apiKey: 'milk/daywise', endpoint: reportsAPI.milkDaywise, columns: [
+        { key: 'date', label: 'Date' }, { key: 'am', label: 'AM (L)' }, { key: 'midday', label: 'Midday (L)' }, { key: 'pm', label: 'PM (L)' }, { key: 'total', label: 'Total (L)' },
       ]},
       { title: 'Per-Animal Milk Report', description: 'Milk totals per animal for the period', apiKey: 'milk/per-animal', endpoint: reportsAPI.milkAnimal, columns: [
         { key: 'tag', label: 'Tag' }, { key: 'name', label: 'Name' }, { key: 'total_litres', label: 'Total (L)' },

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.common.serializers import NullableRelatedFieldMixin
 from apps.tenants.serializers import BreedSerializer, ShedSerializer, AnimalGroupSerializer
 from .models import Animal
 
@@ -54,7 +55,7 @@ class AnimalDetailSerializer(serializers.ModelSerializer):
         return round(delta.days / 30.44)
 
 
-class AnimalCreateSerializer(serializers.ModelSerializer):
+class AnimalCreateSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     class Meta:
         model = Animal
         exclude = ["tenant", "created_at", "updated_at"]

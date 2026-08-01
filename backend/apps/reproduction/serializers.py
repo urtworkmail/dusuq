@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from apps.animals.models import Animal, AnimalStatus
+from apps.common.serializers import NullableRelatedFieldMixin
 from .models import Insemination, PregnancyTest, DryOff, Calving, Abortion
 
 
-class InseminationSerializer(serializers.ModelSerializer):
+class InseminationSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     animal_tag = serializers.CharField(source="animal.tag_number", read_only=True)
     animal_name = serializers.CharField(source="animal.display_name", read_only=True)
     technician_name = serializers.CharField(source="technician.get_full_name", read_only=True)
@@ -20,6 +21,11 @@ class InseminationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Animal does not belong to this farm.")
         return animal
 
+    def validate_technician(self, user):
+        if user is not None and user.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError("Technician does not belong to this farm.")
+        return user
+
     def create(self, validated_data):
         instance = super().create(validated_data)
         # Update animal status to inseminated
@@ -30,7 +36,7 @@ class InseminationSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PregnancyTestSerializer(serializers.ModelSerializer):
+class PregnancyTestSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     animal_tag = serializers.CharField(source="animal.tag_number", read_only=True)
     animal_name = serializers.CharField(source="animal.display_name", read_only=True)
     conducted_by_name = serializers.CharField(source="conducted_by.get_full_name", read_only=True)
@@ -46,6 +52,11 @@ class PregnancyTestSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Animal does not belong to this farm.")
         return animal
 
+    def validate_conducted_by(self, user):
+        if user is not None and user.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError("User does not belong to this farm.")
+        return user
+
     def create(self, validated_data):
         instance = super().create(validated_data)
         animal = instance.animal
@@ -59,7 +70,7 @@ class PregnancyTestSerializer(serializers.ModelSerializer):
         return instance
 
 
-class DryOffSerializer(serializers.ModelSerializer):
+class DryOffSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     animal_tag = serializers.CharField(source="animal.tag_number", read_only=True)
     animal_name = serializers.CharField(source="animal.display_name", read_only=True)
 
@@ -82,7 +93,7 @@ class DryOffSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CalvingSerializer(serializers.ModelSerializer):
+class CalvingSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     dam_tag = serializers.CharField(source="dam.tag_number", read_only=True)
     dam_name = serializers.CharField(source="dam.display_name", read_only=True)
 
@@ -107,7 +118,7 @@ class CalvingSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AbortionSerializer(serializers.ModelSerializer):
+class AbortionSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     animal_tag = serializers.CharField(source="animal.tag_number", read_only=True)
     animal_name = serializers.CharField(source="animal.display_name", read_only=True)
 

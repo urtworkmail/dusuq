@@ -151,6 +151,7 @@ function BulkEntryTab() {
           <FormField label="Session">
             <select value={session} onChange={e => setSession(e.target.value)} className="form-select w-36">
               <option value="am">Morning (AM)</option>
+              <option value="midday">Midday</option>
               <option value="pm">Evening (PM)</option>
             </select>
           </FormField>
@@ -387,7 +388,7 @@ function RecordsTab() {
   })
   const cols = [
     { key: 'date', label: 'Date' },
-    { key: 'session', label: 'Session', render: v => <span className={`badge ${v === 'am' ? 'badge-blue' : 'badge-purple'}`}>{v.toUpperCase()}</span> },
+    { key: 'session', label: 'Session', render: v => <span className={`badge ${{ am: 'badge-blue', midday: 'badge-yellow', pm: 'badge-purple' }[v] ?? 'badge-gray'}`}>{v.toUpperCase()}</span> },
     { key: 'animal_tag', label: 'Tag' },
     { key: 'animal_name', label: 'Name' },
     { key: 'litres', label: 'Litres', render: v => `${v}L` },
@@ -411,7 +412,7 @@ export default function MilkPage() {
   return (
     <div>
       <PageInfoCard pageKey="milk" title="Milk Production">
-        Record daily AM/PM yields, manage chiller readings, consumption and dispatch to buyers.
+        Record daily yields — morning, midday and evening — and manage chiller readings, consumption and dispatch to buyers.
       </PageInfoCard>
       <h1 className="page-title mb-4">Milk Production</h1>
       <TabBar />

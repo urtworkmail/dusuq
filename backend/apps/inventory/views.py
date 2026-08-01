@@ -5,10 +5,11 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Sum
 
+from apps.common.serializers import NullableRelatedFieldMixin
 from .models import Product, StockIn, Consumption, ProductCategory, FeedRation
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     current_stock = serializers.FloatField(read_only=True)
     is_low_stock = serializers.SerializerMethodField()
 
@@ -21,7 +22,7 @@ class ProductSerializer(serializers.ModelSerializer):
         return obj.current_stock <= float(obj.reorder_level)
 
 
-class StockInSerializer(serializers.ModelSerializer):
+class StockInSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.name", read_only=True)
     product_unit = serializers.CharField(source="product.unit", read_only=True)
 
@@ -36,7 +37,7 @@ class StockInSerializer(serializers.ModelSerializer):
         return product
 
 
-class ConsumptionSerializer(serializers.ModelSerializer):
+class ConsumptionSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.name", read_only=True)
     product_unit = serializers.CharField(source="product.unit", read_only=True)
     shed_name = serializers.CharField(source="shed.name", read_only=True)
@@ -45,6 +46,26 @@ class ConsumptionSerializer(serializers.ModelSerializer):
         model = Consumption
         exclude = ["tenant"]
         read_only_fields = ["created_at"]
+
+    def validate_shed(self, shed):
+        if shed is not None and shed.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError("Shed does not belong to this farm.")
+        return shed
+
+    def validate_animal(self, animal):
+        if animal is not None and animal.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError("Animal does not belong to this farm.")
+        return animal
+
+    def validate_treatment(self, treatment):
+        if treatment is not None and treatment.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError("Treatment does not belong to this farm.")
+        return treatment
+
+    def validate_insemination(self, insemination):
+        if insemination is not None and insemination.tenant_id != self.context["request"].tenant.id:
+            raise serializers.ValidationError("Insemination record does not belong to this farm.")
+        return insemination
 
     def validate(self, attrs):
         product = attrs["product"]
@@ -58,7 +79,7 @@ class ConsumptionSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class FeedRationSerializer(serializers.ModelSerializer):
+class FeedRationSerializer(NullableRelatedFieldMixin, serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.name", read_only=True)
     product_unit = serializers.CharField(source="product.unit", read_only=True)
     shed_name = serializers.CharField(source="shed.name", read_only=True)
