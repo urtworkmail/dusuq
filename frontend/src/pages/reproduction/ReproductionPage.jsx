@@ -139,7 +139,8 @@ function InseminationForm({ onSubmit, loading }) {
   const { register, handleSubmit, watch } = useForm({ defaultValues: { insemination_type: 'ai', repeat_number: 1 } })
   const type = watch('insemination_type')
   const { data: animals } = useQuery({ queryKey: ['animals-milking'], queryFn: () => import('@/api/endpoints').then(m => m.animalAPI.list({ status: 'open,inseminated,heifer', page_size: 500 })).then(r => r.data.results ?? []) })
-  const { data: techs } = useQuery({ queryKey: ['users'], queryFn: () => authAPI.listUsers().then(r => r.data) })
+  const { data: techsData } = useQuery({ queryKey: ['users'], queryFn: () => authAPI.listUsers().then(r => r.data) })
+  const techs = Array.isArray(techsData) ? techsData : (techsData?.results ?? [])
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -174,7 +175,7 @@ function InseminationForm({ onSubmit, loading }) {
             <FormField label="Technician">
               <select {...register('technician')} className="form-select">
                 <option value="">— Select —</option>
-                {(techs ?? []).filter(u => ['technician','owner','manager'].includes(u.role)).map(u => (
+                {techs.filter(u => ['technician','owner','manager'].includes(u.role)).map(u => (
                   <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>
                 ))}
               </select>

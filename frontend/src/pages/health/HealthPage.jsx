@@ -113,7 +113,8 @@ function TreatmentForm({ onSubmit, loading }) {
     defaultValues: { route: 'injection', outcome: 'ongoing', withdrawal_days: 0, cost: 0 },
   })
   const { data: animals } = useAllAnimals()
-  const { data: users } = useQuery({ queryKey: ['users'], queryFn: () => authAPI.listUsers().then(r => r.data) })
+  const { data: usersData } = useQuery({ queryKey: ['users'], queryFn: () => authAPI.listUsers().then(r => r.data) })
+  const users = Array.isArray(usersData) ? usersData : (usersData?.results ?? [])
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -163,7 +164,7 @@ function TreatmentForm({ onSubmit, loading }) {
         <FormField label="Administered By">
           <select {...register('administered_by')} className="form-select">
             <option value="">— Select —</option>
-            {(users ?? []).filter(u => ['veterinary', 'owner', 'manager'].includes(u.role)).map(u => (
+            {users.filter(u => ['veterinary', 'owner', 'manager'].includes(u.role)).map(u => (
               <option key={u.id} value={u.id}>{u.first_name} {u.last_name}</option>
             ))}
           </select>
