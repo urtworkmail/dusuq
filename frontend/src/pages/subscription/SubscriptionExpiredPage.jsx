@@ -2,8 +2,37 @@ import { useQuery } from '@tanstack/react-query'
 import { subscriptionAPI } from '@/api/endpoints'
 import { useAuth } from '@/context/AuthContext'
 import { PageSpinner } from '@/components/ui'
-import { Clock, Mail, Phone, LogOut, CheckCircle2 } from 'lucide-react'
+import {
+  Clock, Mail, Phone, LogOut, CheckCircle2, Minus,
+  Beef, Syringe, Heart, Droplets, DollarSign, Package, BarChart2, Users, UploadCloud,
+} from 'lucide-react'
 import { format, parseISO } from 'date-fns'
+
+// The whole ERP is the same for every plan — nothing in the product actually
+// gates these by tier (confirmed against the backend: Plan only stores
+// price + 4 add-on flags, no per-module gating exists anywhere). Listed once
+// here instead of repeated per card so a cheaper plan's card doesn't look
+// broken/empty next to one with add-ons.
+const CORE_MODULES = [
+  { icon: Beef, label: 'Animals & herd records' },
+  { icon: Syringe, label: 'Reproduction & breeding' },
+  { icon: Heart, label: 'Health, vaccinations & treatments' },
+  { icon: Droplets, label: 'Milk production' },
+  { icon: DollarSign, label: 'Accounts & finance' },
+  { icon: Package, label: 'Inventory & feed rations' },
+  { icon: Users, label: 'Payroll' },
+  { icon: BarChart2, label: 'Reports & analytics' },
+  { icon: UploadCloud, label: 'Excel data import' },
+]
+
+// The only things that actually vary by plan — every plan is checked against
+// all four so cards read as a real comparison, not just a list of extras.
+const PLAN_ADDONS = [
+  { key: 'has_ai_assistant', label: 'AI VetAssist' },
+  { key: 'has_priority_support', label: 'Priority support' },
+  { key: 'has_custom_agents', label: 'Custom AI agents' },
+  { key: 'has_beta_access', label: 'Early access to new features' },
+]
 
 export default function SubscriptionExpiredPage() {
   const { user, logout } = useAuth()
@@ -52,23 +81,42 @@ export default function SubscriptionExpiredPage() {
           ) : (
             <>
               {plans.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                  {plans.map(p => (
-                    <div key={p.slug} className="border border-gray-100 rounded-xl p-4">
-                      <p className="font-semibold text-gray-900">{p.name}</p>
-                      {p.tagline && <p className="text-xs text-gray-500 mt-0.5">{p.tagline}</p>}
-                      <p className="text-xl font-bold text-primary-700 mt-2">
-                        PKR {Number(p.price_monthly_pkr).toLocaleString()}
-                        <span className="text-xs font-normal text-gray-400">/mo</span>
-                      </p>
-                      <ul className="mt-3 space-y-1">
-                        {p.has_ai_assistant && <PlanFeature label="AI VetAssist" />}
-                        {p.has_priority_support && <PlanFeature label="Priority support" />}
-                        {p.has_custom_agents && <PlanFeature label="Custom agents" />}
-                        {p.has_beta_access && <PlanFeature label="Early access to new features" />}
-                      </ul>
-                    </div>
-                  ))}
+                <div className="mb-6">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    Every plan includes the full ERP
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 bg-gray-50 rounded-xl p-4 mb-5">
+                    {CORE_MODULES.map(m => (
+                      <div key={m.label} className="flex items-center gap-2 text-xs text-gray-600">
+                        <m.icon size={14} className="text-primary-600 flex-shrink-0" />
+                        {m.label}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {plans.map(p => (
+                      <div key={p.slug} className="border border-gray-100 rounded-xl p-4">
+                        <p className="font-semibold text-gray-900">{p.name}</p>
+                        {p.tagline && <p className="text-xs text-gray-500 mt-0.5">{p.tagline}</p>}
+                        <p className="text-xl font-bold text-primary-700 mt-2">
+                          {p.price_monthly_pkr != null
+                            ? <>PKR {Number(p.price_monthly_pkr).toLocaleString()}<span className="text-xs font-normal text-gray-400">/mo</span></>
+                            : <span className="text-sm font-medium text-gray-500">Contact us for pricing</span>}
+                        </p>
+                        <ul className="mt-3 space-y-1.5">
+                          {PLAN_ADDONS.map(f => (
+                            <li key={f.key} className={`flex items-center gap-1.5 text-xs ${p[f.key] ? 'text-gray-700' : 'text-gray-400'}`}>
+                              {p[f.key]
+                                ? <CheckCircle2 size={13} className="text-green-600 flex-shrink-0" />
+                                : <Minus size={13} className="text-gray-300 flex-shrink-0" />}
+                              {f.label}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -94,13 +142,5 @@ export default function SubscriptionExpiredPage() {
         </div>
       </div>
     </div>
-  )
-}
-
-function PlanFeature({ label }) {
-  return (
-    <li className="flex items-center gap-1.5 text-xs text-gray-600">
-      <CheckCircle2 size={13} className="text-green-600 flex-shrink-0" />{label}
-    </li>
   )
 }
