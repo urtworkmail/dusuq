@@ -16,6 +16,12 @@ export const authAPI = {
   resetPassword:  (data) => api.post('/auth/users/reset-password/', data),
 }
 
+// ─── Subscription (tenant-facing) ──────────────────────────────────────────────
+export const subscriptionAPI = {
+  me:    () => api.get('/subscriptions/me/'),
+  plans: () => api.get('/public/plans/'),
+}
+
 // ─── Tenants ──────────────────────────────────────────────────────────────────
 export const tenantAPI = {
   getProfile:   ()     => api.get('/tenants/profile/'),

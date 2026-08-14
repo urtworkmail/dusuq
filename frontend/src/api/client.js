@@ -25,11 +25,22 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Refresh token on 401
+// Refresh token on 401; redirect to the "trial ended" page on 402 rather than
+// letting every dashboard widget fail silently behind an endless spinner.
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config
+
+    if (
+      error.response?.status === 402 &&
+      error.response?.data?.code === 'subscription_inactive' &&
+      window.location.pathname !== '/subscription-expired'
+    ) {
+      window.location.href = '/subscription-expired'
+      return Promise.reject(error)
+    }
+
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true
       const refresh = localStorage.getItem('refresh_token')

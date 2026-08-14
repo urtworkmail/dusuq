@@ -6,6 +6,7 @@ import PlatformAdminLayout from '@/components/layout/PlatformAdminLayout'
 // Auth pages
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
+import SubscriptionExpiredPage from '@/pages/subscription/SubscriptionExpiredPage'
 
 // Feature pages
 import DashboardPage from '@/pages/dashboard/DashboardPage'
@@ -70,6 +71,10 @@ export default function App() {
       {/* Public */}
       <Route path="/login" element={<RequireGuest><LoginPage /></RequireGuest>} />
       <Route path="/register" element={<RequireGuest><RegisterPage /></RequireGuest>} />
+      {/* Standalone — reachable regardless of auth state, since this is where
+          the global 402 interceptor (client.js) sends an already-logged-in
+          user the instant any request reports an inactive subscription. */}
+      <Route path="/subscription-expired" element={<SubscriptionExpiredPage />} />
 
       {/* Protected — all inside AppLayout */}
       <Route path="/" element={<RequireAuth><AppLayout /></RequireAuth>}>
