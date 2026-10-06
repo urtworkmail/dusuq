@@ -41,7 +41,14 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (error.response?.status === 401 && !original._retry) {
+    // Login itself returning 401 (bad credentials, or the device-verification
+    // challenge) is not an expired-session case — never run the refresh/
+    // redirect-to-login flow for it, let the caller (LoginPage) handle it.
+    if (error.response?.data?.code === 'device_verification_required') {
+      return Promise.reject(error)
+    }
+
+    if (error.response?.status === 401 && !original._retry && !original.url?.includes('/auth/login/')) {
       original._retry = true
       const refresh = localStorage.getItem('refresh_token')
       if (!refresh) {

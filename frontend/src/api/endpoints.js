@@ -14,6 +14,12 @@ export const authAPI = {
   updateUser:     (id, data) => api.patch(`/auth/users/${id}/`, data),
   deactivateUser: (id)   => api.delete(`/auth/users/${id}/`),
   resetPassword:  (data) => api.post('/auth/users/reset-password/', data),
+
+  verifyEmail:        (data) => api.post('/auth/verify-email/', data),
+  resendVerification: ()     => api.post('/auth/resend-verification/'),
+  forgotPassword:     (data) => api.post('/auth/forgot-password/', data),
+  resetPasswordConfirm: (data) => api.post('/auth/reset-password-confirm/', data),
+  verifyDevice:       (data) => api.post('/auth/verify-device/', data),
 }
 
 // ─── Subscription (tenant-facing) ──────────────────────────────────────────────

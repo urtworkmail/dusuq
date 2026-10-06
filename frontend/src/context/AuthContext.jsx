@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback } from 'react'
 import { clearAuth } from '@/api/client'
 import { authAPI } from '@/api/endpoints'
+import { getDeviceId } from '@/utils/device'
 
 const AuthContext = createContext(null)
 
@@ -15,7 +16,7 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     setLoading(true)
     try {
-      const { data } = await authAPI.login({ email, password })
+      const { data } = await authAPI.login({ email, password, device_id: getDeviceId() })
       localStorage.setItem('access_token', data.access)
       localStorage.setItem('refresh_token', data.refresh)
       if (data.user.tenant_id) localStorage.setItem('tenant_id', data.user.tenant_id)
@@ -24,7 +25,28 @@ export function AuthProvider({ children }) {
       setUser(data.user)
       return { ok: true }
     } catch (err) {
+      if (err.response?.data?.code === 'device_verification_required') {
+        return { ok: false, deviceChallenge: true, challengeId: err.response.data.challenge_id }
+      }
       return { ok: false, error: err.response?.data?.detail || 'Login failed' }
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const verifyDevice = useCallback(async (challengeId, code) => {
+    setLoading(true)
+    try {
+      const { data } = await authAPI.verifyDevice({ challenge_id: challengeId, code })
+      localStorage.setItem('access_token', data.access)
+      localStorage.setItem('refresh_token', data.refresh)
+      if (data.user.tenant_id) localStorage.setItem('tenant_id', data.user.tenant_id)
+      else localStorage.removeItem('tenant_id')
+      localStorage.setItem('user', JSON.stringify(data.user))
+      setUser(data.user)
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err.response?.data?.code?.[0] || err.response?.data?.detail || 'Invalid or expired code' }
     } finally {
       setLoading(false)
     }
@@ -33,7 +55,7 @@ export function AuthProvider({ children }) {
   const register = useCallback(async (payload) => {
     setLoading(true)
     try {
-      const { data } = await authAPI.register(payload)
+      const { data } = await authAPI.register({ ...payload, device_id: getDeviceId() })
       localStorage.setItem('access_token', data.access)
       localStorage.setItem('refresh_token', data.refresh)
       if (data.user.tenant_id) localStorage.setItem('tenant_id', data.user.tenant_id)
@@ -68,7 +90,7 @@ export function AuthProvider({ children }) {
   }, [user])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, loading, login, verifyDevice, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

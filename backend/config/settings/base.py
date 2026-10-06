@@ -119,6 +119,7 @@ REST_FRAMEWORK = {
         "register": "5/hour",
         "token_refresh": "30/min",
         "password": "10/hour",
+        "verification": "10/hour",
     },
 }
 
@@ -214,3 +215,18 @@ GEMINI_OUTPUT_COST_PER_1M_TOKENS = env.float("GEMINI_OUTPUT_COST_PER_1M_TOKENS",
 # ─── Billing ────────────────────────────────────────────────────────────────────
 AI_USAGE_SURCHARGE_PERCENT = env.float("AI_USAGE_SURCHARGE_PERCENT", default=25.0)
 TRIAL_PERIOD_DAYS = env.int("TRIAL_PERIOD_DAYS", default=15)
+
+# ─── Email (system auth mail — verification, password reset, new-device) ─────
+# Distinct from apps.notifications, which sends tenant-facing alerts through
+# each farm's own SMTPConfig. These account-security emails must go out under
+# the platform's own identity regardless of what (if anything) a tenant has
+# configured, so they use Django's default EMAIL_BACKEND/DEFAULT_FROM_EMAIL.
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Dusuq ERP <no-reply@dusuq.com>")
+
+# Used to build links inside system emails (verify-email, reset-password).
+FRONTEND_URL = env("FRONTEND_URL", default="https://app.dusuq.com")

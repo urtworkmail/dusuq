@@ -6,6 +6,9 @@ import PlatformAdminLayout from '@/components/layout/PlatformAdminLayout'
 // Auth pages
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage'
+import VerifyEmailPage from '@/pages/auth/VerifyEmailPage'
 import SubscriptionExpiredPage from '@/pages/subscription/SubscriptionExpiredPage'
 
 // Feature pages
@@ -71,6 +74,12 @@ export default function App() {
       {/* Public */}
       <Route path="/login" element={<RequireGuest><LoginPage /></RequireGuest>} />
       <Route path="/register" element={<RequireGuest><RegisterPage /></RequireGuest>} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      {/* Reachable regardless of auth state — e.g. a logged-in user opening a
+          password-reset link from email in the same browser still needs this
+          to work, and a reset forces logout everywhere anyway. */}
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
       {/* Standalone — reachable regardless of auth state, since this is where
           the global 402 interceptor (client.js) sends an already-logged-in
           user the instant any request reports an inactive subscription. */}

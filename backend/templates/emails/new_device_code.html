@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New sign-in to your account</title>
+<style>
+  body { margin: 0; padding: 0; background: #F4FAF6; font-family: Arial, sans-serif; }
+  .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .header { background: #1A6B3C; padding: 28px 32px; text-align: center; }
+  .header h1 { margin: 0; color: #ffffff; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+  .body { padding: 32px; }
+  .greeting { font-size: 15px; color: #444; margin-bottom: 16px; }
+  .code-box { text-align: center; margin: 28px 0; }
+  .code-box span { display: inline-block; background: #F0FAF4; border: 1px solid #1A6B3C; color: #1A6B3C; font-size: 30px; font-weight: 700; letter-spacing: 8px; padding: 14px 24px; border-radius: 8px; }
+  .details { background: #FBF6EC; border-left: 4px solid #C9963B; padding: 14px 18px; border-radius: 6px; font-size: 13px; color: #6b5a2e; margin-top: 20px; }
+  .footer { background: #F4FAF6; padding: 20px 32px; text-align: center; border-top: 1px solid #E0EFE6; }
+  .footer p { margin: 0; font-size: 12px; color: #888; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header"><h1>🐄 Dusuq ERP</h1></div>
+  <div class="body">
+    <p class="greeting">Hello {{ user_name }},</p>
+    <p style="font-size:15px; color:#444;">
+      We noticed a sign-in to your account from a browser we don't recognize. Enter this code to continue:
+    </p>
+    <div class="code-box"><span>{{ code }}</span></div>
+    <p style="font-size:13px; color:#888; text-align:center;">This code expires in 15 minutes.</p>
+    <div class="details">
+      <strong>Sign-in details:</strong><br>
+      IP address: {{ ip }}<br>
+      Device: {{ user_agent }}
+    </div>
+    <p style="font-size:13px; color:#888; margin-top:16px;">If this wasn't you, don't enter this code — and consider changing your password from a device you trust.</p>
+  </div>
+  <div class="footer"><p>Dusuq ERP · Farm Management Platform</p></div>
+</div>
+</body>
+</html>

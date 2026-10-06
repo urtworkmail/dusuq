@@ -5,6 +5,7 @@ import NotificationBell from '@/components/layout/NotificationBell'
 import AlertBar from '@/components/layout/AlertBar'
 import GuidedTour from '@/components/onboarding/GuidedTour'
 import OnboardingChecklist from '@/components/onboarding/OnboardingChecklist'
+import EmailVerificationGate from '@/components/auth/EmailVerificationGate'
 import {
   LayoutDashboard, Beef, Heart, Droplets, DollarSign,
   Package, BarChart2, Settings, LogOut, Menu, X,
@@ -157,6 +158,7 @@ export default function AppLayout() {
 
       <GuidedTour />
       <OnboardingChecklist />
+      <EmailVerificationGate />
     </div>
   )
 }

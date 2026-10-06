@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .emails import send_verification_email
 from .serializers import (
     CustomTokenObtainPairSerializer,
     RegisterSerializer,
@@ -13,6 +14,10 @@ from .serializers import (
     UserUpdateSerializer,
     ChangePasswordSerializer,
     ResetPasswordSerializer,
+    VerifyEmailSerializer,
+    ForgotPasswordSerializer,
+    PasswordResetConfirmSerializer,
+    DeviceVerifySerializer,
 )
 from .permissions import IsTenantOwner, IsSameTenant
 from apps.platform_admin.audit import log_logout
@@ -34,6 +39,14 @@ class TokenRefreshThrottle(throttling.AnonRateThrottle):
 
 class PasswordThrottle(throttling.UserRateThrottle):
     scope = "password"
+
+
+class VerificationThrottle(throttling.AnonRateThrottle):
+    scope = "verification"
+
+
+class ResendVerificationThrottle(throttling.UserRateThrottle):
+    scope = "verification"
 
 
 class LoginView(TokenObtainPairView):
@@ -70,6 +83,7 @@ class RegisterView(APIView):
                     "tenant_id": str(tenant.id),
                     "tenant_name": tenant.name,
                     "is_superuser": user.is_superuser,
+                    "is_email_verified": user.is_email_verified,
                 },
                 "subscription": (
                     {
@@ -159,6 +173,62 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({"detail": "User deactivated."}, status=status.HTTP_200_OK)
+
+
+class VerifyEmailView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [VerificationThrottle]
+
+    def post(self, request):
+        serializer = VerifyEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Email verified."})
+
+
+class ResendVerificationView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [ResendVerificationThrottle]
+
+    def post(self, request):
+        user = request.user
+        if user.is_email_verified:
+            return Response({"detail": "Email already verified."})
+        send_verification_email(user)
+        return Response({"detail": "Verification email sent."})
+
+
+class ForgotPasswordView(APIView):
+    """Self-service — always returns the same response regardless of whether the email matched."""
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [VerificationThrottle]
+
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "If an account exists for that email, a reset link has been sent."})
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [VerificationThrottle]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Password reset. Please log in again."})
+
+
+class VerifyDeviceView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [VerificationThrottle]
+
+    def post(self, request):
+        serializer = DeviceVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.save())
 
 
 class ResetUserPasswordView(APIView):

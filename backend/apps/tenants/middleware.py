@@ -8,6 +8,10 @@ EXEMPT_PATHS = (
     "/api/auth/register/",
     "/api/auth/login/",
     "/api/auth/token/refresh/",
+    "/api/auth/verify-email/",
+    "/api/auth/forgot-password/",
+    "/api/auth/reset-password-confirm/",
+    "/api/auth/verify-device/",
     "/django-admin/",
     "/api/schema/",
     "/api/docs/",
@@ -25,6 +29,20 @@ EXEMPT_PATHS = (
 SUBSCRIPTION_EXEMPT_PATHS = (
     "/api/subscriptions/",
     "/api/auth/",
+)
+
+# Paths an authenticated-but-unverified user must still be able to reach —
+# their own profile, logout, and the resend-verification action itself.
+# Without this an unverified user could never resend the email that would
+# unblock them. Deliberately an exact-path allowlist rather than the
+# "/api/auth/" prefix SUBSCRIPTION_EXEMPT_PATHS uses — that prefix would also
+# cover /api/auth/users/ (owner creates/edits/deactivates other users, resets
+# their passwords), which must stay gated behind verification like everything
+# else, not get a free pass just for living under /api/auth/.
+EMAIL_VERIFICATION_EXEMPT_PATHS = (
+    "/api/auth/me/",
+    "/api/auth/logout/",
+    "/api/auth/resend-verification/",
 )
 
 
@@ -74,6 +92,17 @@ class TenantMiddleware:
             )
 
         request.tenant = tenant
+
+        if not user.is_email_verified and not any(
+            path.startswith(p) for p in EMAIL_VERIFICATION_EXEMPT_PATHS
+        ):
+            return JsonResponse(
+                {
+                    "detail": "Please verify your email address to continue.",
+                    "code": "email_verification_required",
+                },
+                status=403,
+            )
 
         if not any(path.startswith(p) for p in SUBSCRIPTION_EXEMPT_PATHS):
             subscription = getattr(tenant, "subscription", None)
